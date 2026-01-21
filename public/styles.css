@@ -359,8 +359,6 @@ section h2 {
     background-color: rgba(212, 175, 55, 0.1);
     border-color: #e8c547;
 }
-    border-color: var(--accent);
-    background-color: #fafaf8;
 }
 
 /* Length Options */
