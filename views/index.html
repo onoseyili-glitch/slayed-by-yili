@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slayed by Yili - Professional Hair Styling</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">Slayed by Yili</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#portfolio">Portfolio</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#policies">Policies</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Slayed by Yili</h1>
+            <p class="tagline">Student-Friendly Protective Hairstyles for Everyone</p>
+            <button class="btn btn-primary" onclick="scrollToServices()">Book Appointment</button>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2>About Yili</h2>
+            <div class="about-content">
+                <div class="stylist-section">
+                    <div class="stylist-image">
+                        <img src="/yili-profile.jpg" alt="Yili - Professional Hair Stylist" class="profile-image" onerror="this.style.display='none'">
+                    </div>
+                    <div class="stylist-bio">
+                        <h3>Meet Yili</h3>
+                        <p>
+                            Hi, I'm Yili. I specialise in creating neat, clean, and protective hairstyles that allow your natural hair to thrive. 
+                            Whether you're looking for intricate braids, stunning twists, beautiful locs, cornrows, natural hair styling, sew-ins, or styles for your kids, 
+                            I provide professional, inclusive, and student-friendly services.
+                        </p>
+                        <p>
+                            Every client deserves attention and care. That's why I take only one client per day, depending on the style, 
+                            to ensure you receive the best quality service and a personal experience.
+                        </p>
+                    </div>
+                </div>
+                <div class="about-highlights">
+                    <div class="highlight">
+                        <h3>Professional</h3>
+                        <p>Expert styling with meticulous attention to detail</p>
+                    </div>
+                    <div class="highlight">
+                        <h3>Inclusive</h3>
+                        <p>Services for women, men, and kids of all hair types</p>
+                    </div>
+                    <div class="highlight">
+                        <h3>Student-Friendly</h3>
+                        <p>Affordable, flexible booking for students</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2>Services</h2>
+            <div id="serviceCategories" class="service-categories">
+                <!-- Service categories will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Service Selection Modal -->
+    <div id="serviceModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" onclick="closeServiceModal()">&times;</span>
+            <h2 id="modalTitle">Select Hairstyle</h2>
+            <div id="hairstyleOptions" class="options-grid">
+                <!-- Options will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Length Selection Modal -->
+    <div id="lengthModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" onclick="closeLengthModal()">&times;</span>
+            <h2>Select Hair Length</h2>
+            <div class="length-options">
+                <button class="length-btn" data-length="Short">Short</button>
+                <button class="length-btn" data-length="Medium">Medium</button>
+                <button class="length-btn" data-length="Long">Long</button>
+                <button class="length-btn" data-length="Extra Long">Extra Long</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pricing Summary Modal -->
+    <div id="pricingModal" class="modal hidden">
+        <div class="modal-content pricing-summary">
+            <span class="close" onclick="closePricingModal()">&times;</span>
+            <h2>Appointment Summary</h2>
+            <div class="summary-details">
+                <p><strong>Hairstyle:</strong> <span id="summaryHairstyle"></span></p>
+                <p><strong>Length:</strong> <span id="summaryLength"></span></p>
+                <p><strong>Base Price:</strong> £<span id="summaryPrice"></span></p>
+                <p id="depositLine"><strong>Deposit (Non-refundable):</strong> £10.00</p>
+                <p id="depositNote" class="deposit-note">The £10 deposit will be deducted from your final price.</p>
+            </div>
+            
+            <!-- Add-ons Selection -->
+            <div id="addonsSection" class="addons-section" style="display: none;">
+                <h3>Add Optional Extras</h3>
+                <div class="addons-grid">
+                    <label class="addon-option">
+                        <input type="checkbox" data-addon-name="Beads / Accessories" data-addon-price="3" class="addon-checkbox">
+                        <span>Beads / Accessories — £3</span>
+                    </label>
+                    <label class="addon-option">
+                        <input type="checkbox" data-addon-name="Curved / Heart Parts" data-addon-price="5" class="addon-checkbox">
+                        <span>Curved / Heart Parts — £5</span>
+                    </label>
+                    <label class="addon-option">
+                        <input type="checkbox" data-addon-name="Boho Curls" data-addon-price="8" class="addon-checkbox">
+                        <span>Boho Curls — £8</span>
+                    </label>
+                    <label class="addon-option">
+                        <input type="checkbox" data-addon-name="Coloured Extensions" data-addon-price="8" class="addon-checkbox">
+                        <span>Coloured Extensions — £8</span>
+                    </label>
+                    <label class="addon-option">
+                        <input type="checkbox" data-addon-name="Extra Density" data-addon-price="10" class="addon-checkbox">
+                        <span>Extra Density — £10</span>
+                    </label>
+                </div>
+                <p id="addonsTotal" style="display: none; margin-top: 1rem;"><strong>Add-ons Total: £<span id="addonsTotalPrice">0</span></strong></p>
+            </div>
+            
+            <p id="totalCost" style="margin-top: 1rem; font-size: 1.1rem;"><strong>Total: £<span id="totalPrice">0</span></strong></p>
+            <button class="btn btn-primary" onclick="proceedToPayment()">Pay Deposit & Continue to Booking</button>
+        </div>
+    </div>
+
+    <!-- Booking Form Modal -->
+    <div id="bookingModal" class="modal hidden">
+        <div class="modal-content booking-form">
+            <span class="close" onclick="closeBookingModal()">&times;</span>
+            <h2>Complete Your Booking</h2>
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="fullName">Full Name *</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email">
+                </div>
+                <div class="form-group">
+                    <label for="preferredDate">Preferred Date *</label>
+                    <input type="date" id="preferredDate" name="preferredDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="preferredTime">Preferred Time *</label>
+                    <input type="time" id="preferredTime" name="preferredTime" required>
+                </div>
+                <div class="form-group">
+                    <label for="notes">Additional Notes</label>
+                    <textarea id="notes" name="notes" rows="4"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Confirm Booking</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Time Slot Selection Modal -->
+    <div id="timeSlotModal" class="modal hidden">
+        <div class="modal-content booking-form">
+            <span class="close" onclick="closeTimeSlotModal()">&times;</span>
+            <h2>Select Your Appointment Time</h2>
+            <div class="form-group">
+                <label for="appointmentDate">Choose Date *</label>
+                <input type="date" id="appointmentDate" name="appointmentDate" required>
+            </div>
+            <div class="time-slots-container" id="timeSlotsContainer">
+                <!-- Time slots will be populated by JavaScript -->
+            </div>
+            <p id="bookingMessage" style="margin-top: 1rem; text-align: center; color: #d4af37;"></p>
+            <button class="btn btn-primary btn-block" id="confirmTimeBtn" onclick="confirmTimeSlot()" style="margin-top: 1rem;">Continue to Booking Form</button>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal hidden">
+        <div class="modal-content confirmation">
+            <div class="confirmation-icon">✓</div>
+            <h2>Booking Confirmed!</h2>
+            <p>Thank you for booking with Slayed by Yili.</p>
+            <p>A confirmation email has been sent with your booking details.</p>
+            <p class="confirmation-note">You'll receive a message from Yili to confirm your appointment time.</p>
+            <button class="btn btn-primary" onclick="returnHome()">Return Home</button>
+        </div>
+    </div>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="portfolio">
+        <div class="container">
+            <h2>Our Work</h2>
+            <p class="section-subtitle">Watch some of our recent work</p>
+            <div class="portfolio-gallery">
+                <div class="portfolio-item">
+                    <video width="100%" controls poster="/logo.jpg">
+                        <source src="/portfolio-video-1.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="portfolio-item">
+                    <video width="100%" controls poster="/logo.jpg">
+                        <source src="/portfolio-video-2.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="portfolio-item">
+                    <video width="100%" controls poster="/logo.jpg">
+                        <source src="/portfolio-video-3.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="portfolio-item">
+                    <video width="100%" controls poster="/logo.jpg">
+                        <source src="/portfolio-video-4.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="portfolio-item">
+                    <video width="100%" controls poster="/logo.jpg">
+                        <source src="/portfolio-video-5.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="portfolio-item">
+                    <video width="100%" controls poster="/logo.jpg">
+                        <source src="/portfolio-video-6.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="portfolio-item">
+                    <video width="100%" controls poster="/logo.jpg">
+                        <source src="/portfolio-video-7.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="portfolio-item">
+                    <video width="100%" controls poster="/logo.jpg">
+                        <source src="/portfolio-video-8.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="portfolio-item">
+                    <video width="100%" controls poster="/logo.jpg">
+                        <source src="/portfolio-video-9.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="portfolio-item">
+                    <video width="100%" controls poster="/logo.jpg">
+                        <source src="/portfolio-video-10.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="portfolio-item">
+                    <video width="100%" controls poster="/logo.jpg">
+                        <source src="/portfolio-video-11.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="portfolio-item">
+                    <video width="100%" controls poster="/logo.jpg">
+                        <source src="/portfolio-video-12.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="portfolio-item">
+                    <video width="100%" controls poster="/logo.jpg">
+                        <source src="/portfolio-video-13.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Policies Section -->
+    <section id="policies" class="policies">
+        <div class="container">
+            <h2>Booking Policies</h2>
+            <div class="policies-grid">
+                <div class="policy-card">
+                    <h3>Deposit Required</h3>
+                    <p>£10 non-refundable deposit required to secure all appointments. This amount will be deducted from your final price.</p>
+                </div>
+                <div class="policy-card">
+                    <h3>Punctuality</h3>
+                    <p>Appointments over 15 minutes late may be cancelled or charged a £5 late fee.</p>
+                </div>
+                <div class="policy-card">
+                    <h3>One Client Per Day</h3>
+                    <p>Only one client is booked per day depending on the style to ensure quality service.</p>
+                </div>
+                <div class="policy-card">
+                    <h3>No Deposit, No Booking</h3>
+                    <p>Your appointment is only secure once the £10 deposit has been paid.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Referral Section -->
+    <section class="referral">
+        <div class="container">
+            <div class="referral-content">
+                <h2>Refer a Friend</h2>
+                <p>Know someone who needs professional protective styling? Refer them to Slayed by Yili and receive <strong>10% off your next hairstyle!</strong></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2>Get in Touch</h2>
+            <div class="contact-info">
+                <p>Ready to get slayed?</p>
+                <button class="btn btn-primary" onclick="scrollToServices()">Book Now</button>
+                <div class="contact-details">
+                    <p><strong>Email:</strong> <a href="mailto:pecusadoh@gmail.com">pecusadoh@gmail.com</a></p>
+                    <p><strong>Phone:</strong> <a href="tel:07500039928">07500 039928</a></p>
+                </div>
+                <div class="social-links">
+                    <a href="https://instagram.com/slayed_by_yili" target="_blank" class="social-link">Instagram @slayed_by_yili</a>
+                    <a href="https://wa.me/447500039928" target="_blank" class="social-link">WhatsApp</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Slayed by Yili. All rights reserved. Professional hair styling for everyone.</p>
+        </div>
+    </footer>
+
+    <script src="/app.js"></script>
+</body>
+</html>
