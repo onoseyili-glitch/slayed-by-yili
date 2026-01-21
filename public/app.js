@@ -467,6 +467,10 @@ function closeBookingModal() {
 async function handleBookingSubmit(e) {
     e.preventDefault();
     
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Processing...';
+    
     const bookingData = {
         fullName: document.getElementById('fullName').value,
         phone: document.getElementById('phone').value,
@@ -495,18 +499,28 @@ async function handleBookingSubmit(e) {
         });
         
         console.log('Response status:', response.status);
-        const responseData = await response.json();
+        
+        let responseData;
+        try {
+            responseData = await response.json();
+        } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+            throw new Error('Server returned invalid response');
+        }
+        
         console.log('Response data:', responseData);
         
         if (!response.ok) {
-            throw new Error(responseData.error || 'Failed to submit booking');
+            throw new Error(responseData.error || `Server error: ${response.status}`);
         }
         
         closeBookingModal();
         openConfirmationModal();
     } catch (error) {
         console.error('Booking error:', error);
-        alert('Booking error: ' + error.message);
+        alert('Booking failed: ' + error.message + '\n\nPlease check your internet connection or try again later.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Confirm Booking';
     }
 }
 
