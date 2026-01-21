@@ -22,32 +22,50 @@ async function sendConfirmationEmail(booking) {
     }
     
     const emailContent = `
-        <h2>New Booking Confirmation</h2>
-        <p><strong>Client Name:</strong> ${booking.fullName}</p>
-        <p><strong>Phone Number:</strong> ${booking.phone}</p>
-        <p><strong>Email Address:</strong> ${booking.email}</p>
-        <hr>
-        <p><strong>Hairstyle:</strong> ${booking.hairstyle}</p>
-        <p><strong>Length:</strong> ${booking.length}</p>
-        <p><strong>Base Price:</strong> £${booking.price}.00</p>
-        ${addonsHTML}
-        ${booking.addonTotal > 0 ? `<p><strong>Add-ons Total:</strong> £${booking.addonTotal}.00</p>` : ''}
-        <p><strong>Total Price:</strong> £${booking.totalPrice}.00</p>
-        ${booking.depositPaid > 0 ? `<p><strong>Deposit Paid:</strong> £${booking.depositPaid}.00 (Non-refundable) — Deducted from final price</p>` : '<p><strong>No Deposit Required</strong> (Add-ons only)</p>'}
-        <hr>
-        <p><strong>Preferred Date:</strong> ${booking.preferredDate}</p>
-        <p><strong>Preferred Time:</strong> ${booking.preferredTime}</p>
-        <p><strong>Additional Notes:</strong> ${booking.notes}</p>
-        <hr>
-        <p><strong>Payment Intent ID:</strong> ${booking.paymentIntentId || 'N/A'}</p>
-        <p><strong>Booked At:</strong> ${booking.bookedAt}</p>
-        <p>Please contact the client to confirm the appointment time.</p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #d4af37;">📧 New Booking Received</h2>
+            
+            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="color: #0a0a0a; margin-top: 0;">Client Information</h3>
+                <p><strong>Name:</strong> ${booking.fullName}</p>
+                <p><strong>Email:</strong> ${booking.email}</p>
+                <p><strong>Phone:</strong> ${booking.phone}</p>
+                <p><strong>Notes:</strong> ${booking.notes || 'None'}</p>
+            </div>
+
+            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="color: #0a0a0a; margin-top: 0;">Appointment Details</h3>
+                <p><strong>📅 Date:</strong> ${booking.preferredDate}</p>
+                <p><strong>🕐 Time:</strong> ${booking.preferredTime}</p>
+                <p><strong>💇 Hairstyle:</strong> ${booking.hairstyle}</p>
+                <p><strong>📏 Length:</strong> ${booking.length}</p>
+            </div>
+
+            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="color: #0a0a0a; margin-top: 0;">Pricing</h3>
+                <p><strong>Base Price:</strong> £${booking.price}.00</p>
+                ${addonsHTML}
+                ${booking.addonTotal > 0 ? `<p><strong>Add-ons Total:</strong> £${booking.addonTotal}.00</p>` : ''}
+                <p style="border-top: 1px solid #ddd; padding-top: 10px; margin-top: 10px;"><strong>Total Price:</strong> £${booking.totalPrice}.00</p>
+                <p><strong>Deposit Paid:</strong> £${booking.depositPaid}.00 (Non-refundable)</p>
+                <p style="color: #4caf50;"><strong>Remaining Balance:</strong> £${booking.totalPrice - booking.depositPaid}.00</p>
+            </div>
+
+            <p style="margin: 20px 0;">Please contact the client to confirm the appointment time. You can reply to this email or call them at ${booking.phone}.</p>
+
+            <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+
+            <p style="font-size: 12px; color: #666;">
+                <strong>Booking ID:</strong> ${booking.id}<br>
+                <strong>Booked:</strong> ${booking.bookedAt}
+            </p>
+        </div>
     `;
 
     const msg = {
         to: process.env.EMAIL_TO,
         from: process.env.EMAIL_USER,
-        subject: `New Booking: ${booking.fullName} - ${booking.hairstyle}`,
+        subject: `New Booking: ${booking.fullName} - ${booking.hairstyle} on ${booking.preferredDate}`,
         html: emailContent
     };
 
@@ -60,33 +78,53 @@ async function sendCustomerConfirmationEmail(booking) {
         return;
     }
 
-    const cancellationLink = `${process.env.APP_URL || 'http://localhost:5000'}/cancel-booking?id=${booking.id}&token=${booking.cancellationToken}`;
+    const baseURL = process.env.APP_URL || 'https://slayed-by-yili.onrender.com';
+    const cancelLink = `${baseURL}/cancel-booking?id=${booking.id}&token=${booking.cancellationToken}`;
+    const rescheduleLink = `${baseURL}/reschedule-booking?id=${booking.id}&token=${booking.cancellationToken}`;
     
     const emailContent = `
-        <h2>Your Booking is Confirmed!</h2>
-        <p>Hi ${booking.fullName},</p>
-        <p>Thank you for booking with Slayed by Yili!</p>
-        <hr>
-        <h3>Booking Details</h3>
-        <p><strong>Hairstyle:</strong> ${booking.hairstyle}</p>
-        <p><strong>Length:</strong> ${booking.length}</p>
-        <p><strong>Date:</strong> ${booking.preferredDate}</p>
-        <p><strong>Time:</strong> ${booking.preferredTime}</p>
-        <p><strong>Total Price:</strong> £${booking.totalPrice}.00</p>
-        <p><strong>Deposit Paid:</strong> £${booking.depositPaid}.00</p>
-        <hr>
-        <p>You'll receive a confirmation message from Yili to confirm your appointment.</p>
-        <p>Thank you for choosing Slayed by Yili!</p>
-        <hr>
-        <h3>Need to Cancel?</h3>
-        <p><a href="${cancellationLink}" style="background-color: #d4af37; color: #0a0a0a; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold;">Cancel Booking</a></p>
-        <p><small>You can cancel for free if you do so more than 24 hours before your appointment.</small></p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #d4af37;">Booking Confirmed! ✨</h2>
+            <p>Hi ${booking.fullName},</p>
+            <p>Thank you for booking with <strong>Slayed by Yili</strong>! Your appointment is confirmed.</p>
+            
+            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="color: #0a0a0a; margin-top: 0;">Your Appointment Details</h3>
+                <p><strong>📅 Date:</strong> ${booking.preferredDate}</p>
+                <p><strong>🕐 Time:</strong> ${booking.preferredTime}</p>
+                <p><strong>💇 Hairstyle:</strong> ${booking.hairstyle}</p>
+                <p><strong>📏 Length:</strong> ${booking.length}</p>
+                <p><strong>💷 Total Price:</strong> £${booking.totalPrice}.00</p>
+                <p><strong>✅ Deposit Paid:</strong> £${booking.depositPaid}.00 (deducted from final price)</p>
+            </div>
+
+            <p style="margin: 20px 0;">Yili will send you a confirmation message shortly to confirm the appointment time. If you have any special requests, please reply to this email or contact us directly.</p>
+
+            <div style="margin: 30px 0; padding: 20px; border-top: 2px solid #d4af37; border-bottom: 2px solid #d4af37;">
+                <h3 style="color: #0a0a0a;">What's Next?</h3>
+                <p style="margin: 15px 0;">
+                    <a href="${rescheduleLink}" style="background-color: #d4af37; color: #0a0a0a; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold; margin-right: 10px;">Reschedule Appointment</a>
+                    <a href="${cancelLink}" style="background-color: #ff6b6b; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold;">Cancel Booking</a>
+                </p>
+            </div>
+
+            <p style="font-size: 12px; color: #666;">
+                <strong>Cancellation Policy:</strong> You can cancel free of charge more than 24 hours before your appointment. Cancellations within 24 hours may incur a £5 fee.
+            </p>
+
+            <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+
+            <p>Best regards,<br><strong>Slayed by Yili</strong></p>
+            <p style="font-size: 12px; color: #666;">
+                📧 pecusadoh@gmail.com | 📱 07500 039928
+            </p>
+        </div>
     `;
 
     const msg = {
         to: booking.email,
         from: process.env.EMAIL_USER,
-        subject: 'Booking Confirmation - Slayed by Yili',
+        subject: '✨ Your Booking is Confirmed - Slayed by Yili',
         html: emailContent
     };
 
@@ -101,40 +139,48 @@ async function sendCancellationConfirmationEmail(booking, hoursUntilAppointment,
     }
 
     let emailContent = `
-        <h2>Booking Cancellation Request Received</h2>
-        <p>Hi ${booking.fullName},</p>
-        <p>We have received your cancellation request for your appointment on <strong>${booking.preferredDate} at ${booking.preferredTime}</strong>.</p>
-        <hr>
-        <h3>Cancellation Details</h3>
-        <p><strong>Hairstyle:</strong> ${booking.hairstyle}</p>
-        <p><strong>Original Deposit:</strong> £${booking.depositPaid}.00</p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #d4af37;">Cancellation Request Received</h2>
+            <p>Hi ${booking.fullName},</p>
+            <p>We have received your cancellation request for your appointment on <strong>${booking.preferredDate} at ${booking.preferredTime}</strong>.</p>
+            
+            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="color: #0a0a0a; margin-top: 0;">Cancellation Details</h3>
+                <p><strong>💇 Hairstyle:</strong> ${booking.hairstyle}</p>
+                <p><strong>📏 Length:</strong> ${booking.length}</p>
+                <p><strong>💷 Original Deposit:</strong> £${booking.depositPaid}.00</p>
     `;
     
     if (awaitingPayment) {
         emailContent += `
-            <p><strong>Cancellation Fee:</strong> £5.00</p>
-            <p style="color: #ff6b6b;"><strong>Status:</strong> Awaiting payment confirmation</p>
-            <p>You cancelled less than 24 hours before your appointment. A £5 cancellation fee applies. Your cancellation will be confirmed after payment is processed.</p>
+                <p><strong>⚠️ Cancellation Fee:</strong> £5.00</p>
+                <p style="color: #ff6b6b;"><strong>Status:</strong> Awaiting fee payment</p>
+                <p>You cancelled less than 24 hours before your appointment. A £5 cancellation fee applies. Your cancellation will be confirmed after payment is processed.</p>
         `;
     } else {
         emailContent += `
-            <p style="color: #4caf50;"><strong>Status:</strong> Free Cancellation Confirmed</p>
-            <p>You cancelled more than 24 hours before your appointment. No cancellation fee applies. Your deposit will be refunded.</p>
+                <p style="color: #4caf50;"><strong>✅ Status:</strong> Cancellation Confirmed (FREE)</p>
+                <p>You cancelled more than 24 hours before your appointment. No cancellation fee applies. Your deposit of £${booking.depositPaid}.00 will be refunded within 5-7 business days.</p>
         `;
     }
     
     emailContent += `
-        <hr>
-        <p><strong>What happens next?</strong></p>
-        <p>Yili will confirm your cancellation and process your refund accordingly. You will receive a confirmation email shortly.</p>
-        <p>If you have any questions, please contact us:</p>
-        <p>Email: pecusadoh@gmail.com<br>Phone: 07500 039928</p>
+            </div>
+
+            <p style="margin: 20px 0;">Yili will confirm your cancellation and process your refund accordingly. If you have any questions, please contact us.</p>
+
+            <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+
+            <p style="font-size: 12px; color: #666;">
+                📧 pecusadoh@gmail.com | 📱 07500 039928
+            </p>
+        </div>
     `;
 
     const msg = {
         to: booking.email,
         from: process.env.EMAIL_USER,
-        subject: 'Booking Cancellation Request - Slayed by Yili',
+        subject: '✂️ Cancellation Request Received - Slayed by Yili',
         html: emailContent
     };
 
@@ -149,45 +195,55 @@ async function sendCancellationNotificationToStylist(booking, hoursUntilAppointm
     }
 
     let emailContent = `
-        <h2>Booking Cancellation Notification</h2>
-        <p><strong>${booking.fullName}</strong> has requested to cancel their booking.</p>
-        <hr>
-        <h3>Booking Details</h3>
-        <p><strong>Hairstyle:</strong> ${booking.hairstyle}</p>
-        <p><strong>Length:</strong> ${booking.length}</p>
-        <p><strong>Scheduled Date:</strong> ${booking.preferredDate}</p>
-        <p><strong>Scheduled Time:</strong> ${booking.preferredTime}</p>
-        <p><strong>Cancellation Reason:</strong> ${booking.cancellationReason}</p>
-        <hr>
-        <h3>Refund Policy</h3>
-        <p><strong>Hours before appointment:</strong> ${Math.ceil(hoursUntilAppointment)}h</p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #ff6b6b;">⚠️ Booking Cancellation Request</h2>
+            <p><strong>${booking.fullName}</strong> has requested to cancel their appointment.</p>
+            
+            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="color: #0a0a0a; margin-top: 0;">Booking Details</h3>
+                <p><strong>📅 Appointment Date:</strong> ${booking.preferredDate}</p>
+                <p><strong>🕐 Appointment Time:</strong> ${booking.preferredTime}</p>
+                <p><strong>💇 Hairstyle:</strong> ${booking.hairstyle}</p>
+                <p><strong>📏 Length:</strong> ${booking.length}</p>
+                <p><strong>⏰ Hours until appointment:</strong> ${Math.ceil(hoursUntilAppointment)}h</p>
+                <p><strong>💷 Deposit Received:</strong> £${booking.depositPaid}.00</p>
+            </div>
+
+            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="color: #0a0a0a; margin-top: 0;">Refund Status</h3>
     `;
     
     if (awaitingPayment) {
         emailContent += `
-            <p><strong>Status:</strong> Awaiting £5 cancellation fee payment</p>
-            <p>Client cancelled less than 24 hours before appointment. They need to pay £5 before cancellation is confirmed.</p>
-            <p style="color: #ff6b6b;"><strong>Action required:</strong> Review cancellation reason - fee may be waivable if valid reason provided.</p>
+                <p style="color: #ff6b6b;"><strong>⚠️ Status:</strong> Awaiting £5 cancellation fee payment</p>
+                <p>Client cancelled less than 24 hours before appointment. A £5 cancellation fee applies.</p>
+                <p><strong>Action:</strong> Client needs to pay £5 to confirm cancellation.</p>
         `;
     } else {
         emailContent += `
-            <p><strong>Status:</strong> Free cancellation confirmed</p>
-            <p>Client cancelled more than 24 hours before appointment. Process refund of £${booking.depositPaid}.00.</p>
+                <p style="color: #4caf50;"><strong>✅ Status:</strong> Free Cancellation Approved</p>
+                <p>Client cancelled more than 24 hours before appointment. Process refund of £${booking.depositPaid}.00.</p>
         `;
     }
     
     emailContent += `
-        <hr>
-        <p><strong>Client Contact:</strong></p>
-        <p>Name: ${booking.fullName}<br>Phone: ${booking.phone}<br>Email: ${booking.email}</p>
-    `;
+            </div>
 
-    const subject = `Cancellation Request: ${booking.fullName} - ${booking.preferredDate}`;
+            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="color: #0a0a0a; margin-top: 0;">Client Contact</h3>
+                <p><strong>Name:</strong> ${booking.fullName}</p>
+                <p><strong>Phone:</strong> ${booking.phone}</p>
+                <p><strong>Email:</strong> ${booking.email}</p>
+            </div>
+
+            <p style="margin: 20px 0;">Please review the cancellation reason and determine if the £5 fee should be waived.</p>
+        </div>
+    `;
 
     const msg = {
         to: process.env.EMAIL_TO,
         from: process.env.EMAIL_USER,
-        subject: subject,
+        subject: `Cancellation Request: ${booking.fullName} - ${booking.preferredDate}`,
         html: emailContent
     };
 
@@ -201,32 +257,49 @@ async function sendRescheduleConfirmationEmail(booking, oldDate, oldTime) {
         return;
     }
 
+    const baseURL = process.env.APP_URL || 'https://slayed-by-yili.onrender.com';
+    const cancelLink = `${baseURL}/cancel-booking?id=${booking.id}&token=${booking.cancellationToken}`;
+
     const emailContent = `
-        <h2>Booking Rescheduled Successfully</h2>
-        <p>Hi ${booking.fullName},</p>
-        <p>Your appointment has been rescheduled successfully!</p>
-        <hr>
-        <h3>Original Booking</h3>
-        <p><strong>Date:</strong> ${oldDate}</p>
-        <p><strong>Time:</strong> ${oldTime}</p>
-        <hr>
-        <h3>New Booking Details</h3>
-        <p><strong>Hairstyle:</strong> ${booking.hairstyle}</p>
-        <p><strong>Length:</strong> ${booking.length}</p>
-        <p><strong>Date:</strong> ${booking.preferredDate}</p>
-        <p><strong>Time:</strong> ${booking.preferredTime}</p>
-        <p><strong>Total Price:</strong> £${booking.totalPrice}.00</p>
-        <p><strong>Deposit (already paid):</strong> £${booking.depositPaid}.00</p>
-        <hr>
-        <p>Your original deposit is still valid and will be deducted from the total payment on your new appointment date.</p>
-        <p>If you need to reschedule or cancel again, you can contact Yili directly at:</p>
-        <p>Email: pecusadoh@gmail.com<br>Phone: 07500 039928</p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #d4af37;">✅ Appointment Rescheduled!</h2>
+            <p>Hi ${booking.fullName},</p>
+            <p>Your appointment has been successfully rescheduled!</p>
+            
+            <div style="background-color: #fff3cd; padding: 15px; border-radius: 4px; margin: 20px 0; border-left: 4px solid #d4af37;">
+                <h3 style="color: #856404; margin-top: 0;">Previous Appointment</h3>
+                <p><strong>📅 Date:</strong> ${oldDate}</p>
+                <p><strong>🕐 Time:</strong> ${oldTime}</p>
+            </div>
+
+            <div style="background-color: #d4f1d4; padding: 15px; border-radius: 4px; margin: 20px 0; border-left: 4px solid #4caf50;">
+                <h3 style="color: #2d5016; margin-top: 0;">New Appointment</h3>
+                <p><strong>📅 Date:</strong> ${booking.preferredDate}</p>
+                <p><strong>🕐 Time:</strong> ${booking.preferredTime}</p>
+                <p><strong>💇 Hairstyle:</strong> ${booking.hairstyle}</p>
+                <p><strong>📏 Length:</strong> ${booking.length}</p>
+                <p><strong>💷 Total Price:</strong> £${booking.totalPrice}.00</p>
+                <p><strong>✅ Deposit (already paid):</strong> £${booking.depositPaid}.00 (applies to new appointment)</p>
+            </div>
+
+            <p style="margin: 20px 0;">Your original deposit of £${booking.depositPaid}.00 remains valid and will be deducted from the total payment on your new appointment date.</p>
+
+            <div style="margin: 20px 0; padding: 20px; border: 2px solid #d4af37; border-radius: 4px;">
+                <p style="margin: 10px 0;">
+                    <a href="${cancelLink}" style="background-color: #ff6b6b; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold;">Cancel This Appointment</a>
+                </p>
+            </div>
+
+            <p style="font-size: 12px; color: #666;">
+                <strong>Questions?</strong> Contact us anytime at pecusadoh@gmail.com or 07500 039928
+            </p>
+        </div>
     `;
 
     const msg = {
         to: booking.email,
         from: process.env.EMAIL_USER,
-        subject: 'Booking Rescheduled - Slayed by Yili',
+        subject: '✅ Your Appointment Has Been Rescheduled - Slayed by Yili',
         html: emailContent
     };
 
@@ -241,20 +314,35 @@ async function sendRescheduleNotificationToStylist(booking, oldDate, oldTime) {
     }
 
     const emailContent = `
-        <h2>Booking Rescheduled</h2>
-        <p><strong>${booking.fullName}</strong> has rescheduled their booking.</p>
-        <hr>
-        <h3>Original Booking</h3>
-        <p><strong>Date:</strong> ${oldDate}</p>
-        <p><strong>Time:</strong> ${oldTime}</p>
-        <hr>
-        <h3>New Booking Details</h3>
-        <p><strong>Date:</strong> ${booking.preferredDate}</p>
-        <p><strong>Time:</strong> ${booking.preferredTime}</p>
-        <p><strong>Hairstyle:</strong> ${booking.hairstyle}</p>
-        <p><strong>Length:</strong> ${booking.length}</p>
-        <p><strong>Total Price:</strong> £${booking.totalPrice}.00</p>
-        <p><strong>Deposit:</strong> £${booking.depositPaid}.00</p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #d4af37;">📅 Appointment Rescheduled</h2>
+            <p><strong>${booking.fullName}</strong> has rescheduled their appointment.</p>
+            
+            <div style="background-color: #fff3cd; padding: 15px; border-radius: 4px; margin: 20px 0; border-left: 4px solid #d4af37;">
+                <h3 style="color: #856404; margin-top: 0;">Previous Appointment</h3>
+                <p><strong>📅 Date:</strong> ${oldDate}</p>
+                <p><strong>🕐 Time:</strong> ${oldTime}</p>
+            </div>
+
+            <div style="background-color: #d4f1d4; padding: 15px; border-radius: 4px; margin: 20px 0; border-left: 4px solid #4caf50;">
+                <h3 style="color: #2d5016; margin-top: 0;">New Appointment</h3>
+                <p><strong>📅 Date:</strong> ${booking.preferredDate}</p>
+                <p><strong>🕐 Time:</strong> ${booking.preferredTime}</p>
+                <p><strong>💇 Hairstyle:</strong> ${booking.hairstyle}</p>
+                <p><strong>📏 Length:</strong> ${booking.length}</p>
+                <p><strong>💷 Total Price:</strong> £${booking.totalPrice}.00</p>
+                <p><strong>Deposit:</strong> £${booking.depositPaid}.00</p>
+            </div>
+
+            <div style="background-color: #f5f5f5; padding: 15px; border-radius: 4px; margin: 20px 0;">
+                <h3 style="color: #0a0a0a; margin-top: 0;">Client Details</h3>
+                <p><strong>Name:</strong> ${booking.fullName}</p>
+                <p><strong>Phone:</strong> ${booking.phone}</p>
+                <p><strong>Email:</strong> ${booking.email}</p>
+            </div>
+
+            <p style="margin: 20px 0;">Please note the new appointment time in your calendar.</p>
+        </div>
     `;
 
     const msg = {
