@@ -117,9 +117,9 @@ async function sendCustomerConfirmationEmail(booking) {
 
             <div style="background-color: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4caf50;">
                 <h3 style="color: #2e7d32; margin-top: 0;">💰 Bank Transfer Details</h3>
-                <p style="margin: 8px 0;"><strong>Account Name:</strong> [Your Business Name]</p>
-                <p style="margin: 8px 0;"><strong>Sort Code:</strong> [Your Sort Code]</p>
-                <p style="margin: 8px 0;"><strong>Account Number:</strong> [Your Account Number]</p>
+                <p style="margin: 8px 0;"><strong>Account Name:</strong> Onoseyili Peculiar Lugard-Sadoh</p>
+                <p style="margin: 8px 0;"><strong>Sort Code:</strong> 23-32-72</p>
+                <p style="margin: 8px 0;"><strong>Account Number:</strong> 11282972</p>
                 <p style="margin: 8px 0;"><strong>Amount:</strong> £10.00</p>
                 <p style="margin: 8px 0;"><strong>Reference:</strong> ${booking.fullName.split(' ')[0]}-${booking.preferredDate}</p>
             </div>
