@@ -125,12 +125,22 @@ app.post('/submit-booking', async (req, res) => {
         // Store booking
         bookings.push(booking);
 
-        // Send confirmation email to business owner
-        await sendConfirmationEmail(booking);
+        // Send confirmation emails with error handling
+        try {
+            await sendConfirmationEmail(booking);
+        } catch (emailError) {
+            console.error('Failed to send confirmation email:', emailError);
+            // Continue even if email fails
+        }
 
         // Optionally send confirmation email to customer
         if (email) {
-            await sendCustomerConfirmationEmail(booking);
+            try {
+                await sendCustomerConfirmationEmail(booking);
+            } catch (emailError) {
+                console.error('Failed to send customer email:', emailError);
+                // Continue even if email fails
+            }
         }
 
         res.json({
@@ -186,7 +196,12 @@ async function sendConfirmationEmail(booking) {
     };
 
     return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+            reject(new Error('Email send timeout'));
+        }, 10000);
+        
         transporter.sendMail(mailOptions, (error, info) => {
+            clearTimeout(timeout);
             if (error) {
                 console.error('Email sending error:', error);
                 reject(error);
@@ -231,7 +246,12 @@ async function sendCustomerConfirmationEmail(booking) {
     };
 
     return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+            reject(new Error('Email send timeout'));
+        }, 10000);
+        
         transporter.sendMail(mailOptions, (error, info) => {
+            clearTimeout(timeout);
             if (error) {
                 console.error('Customer email error:', error);
                 reject(error);
