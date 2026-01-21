@@ -125,28 +125,28 @@ app.post('/submit-booking', async (req, res) => {
         // Store booking
         bookings.push(booking);
 
-        // Send confirmation emails with error handling
-        try {
-            await sendConfirmationEmail(booking);
-        } catch (emailError) {
-            console.error('Failed to send confirmation email:', emailError);
-            // Continue even if email fails
-        }
-
-        // Optionally send confirmation email to customer
-        if (email) {
-            try {
-                await sendCustomerConfirmationEmail(booking);
-            } catch (emailError) {
-                console.error('Failed to send customer email:', emailError);
-                // Continue even if email fails
-            }
-        }
-
+        // Send response immediately
         res.json({
             success: true,
             bookingId: booking.id,
             message: 'Booking confirmed successfully'
+        });
+
+        // Send emails asynchronously without blocking
+        setImmediate(async () => {
+            try {
+                await sendConfirmationEmail(booking);
+            } catch (emailError) {
+                console.error('Failed to send confirmation email:', emailError);
+            }
+
+            if (email) {
+                try {
+                    await sendCustomerConfirmationEmail(booking);
+                } catch (emailError) {
+                    console.error('Failed to send customer email:', emailError);
+                }
+            }
         });
     } catch (error) {
         console.error('Booking submission error:', error);
