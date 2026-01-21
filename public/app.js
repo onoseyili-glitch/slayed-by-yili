@@ -315,19 +315,8 @@ function closePricingModal() {
 
 function proceedToPayment() {
     closePricingModal();
-    
-    // Add-ons don't require deposit payment - go straight to time slot
-    if (currentState.selectedCategory === 'addons') {
-        openTimeSlotModal();
-        return;
-    }
-    
-    // All other services require Square deposit payment
-    window.open('https://square.link/u/0f0lHs5y', '_blank');
-    // Show time slot selection after a brief delay to allow user to complete payment
-    setTimeout(() => {
-        openTimeSlotModal();
-    }, 500);
+    // Go straight to time slot selection (payment handled via bank transfer after booking)
+    openTimeSlotModal();
 }
 
 function openTimeSlotModal() {

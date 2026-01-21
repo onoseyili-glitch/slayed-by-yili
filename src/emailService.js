@@ -23,7 +23,12 @@ async function sendConfirmationEmail(booking) {
     
     const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #d4af37;">📧 New Booking Received</h2>
+            <h2 style="color: #d4af37;">📧 New Booking Request (Pending Deposit)</h2>
+            
+            <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ff9800;">
+                <p style="margin: 0; font-weight: bold; color: #856404;">⏳ Awaiting £10 deposit via bank transfer</p>
+                <p style="margin: 8px 0 0 0; color: #856404; font-size: 14px;">Confirm booking once deposit received</p>
+            </div>
             
             <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
                 <h3 style="color: #0a0a0a; margin-top: 0;">Client Information</h3>
@@ -47,11 +52,18 @@ async function sendConfirmationEmail(booking) {
                 ${addonsHTML}
                 ${booking.addonTotal > 0 ? `<p><strong>Add-ons Total:</strong> £${booking.addonTotal}.00</p>` : ''}
                 <p style="border-top: 1px solid #ddd; padding-top: 10px; margin-top: 10px;"><strong>Total Price:</strong> £${booking.totalPrice}.00</p>
-                <p><strong>Deposit Paid:</strong> £${booking.depositPaid}.00 (Non-refundable)</p>
-                <p style="color: #4caf50;"><strong>Remaining Balance:</strong> £${booking.totalPrice - booking.depositPaid}.00</p>
+                <p style="color: #ff9800;"><strong>Deposit Status:</strong> Awaiting £10.00 bank transfer</p>
+                <p style="color: #4caf50;"><strong>Remaining Balance:</strong> £${booking.totalPrice - 10}.00 (to collect at appointment)</p>
             </div>
 
-            <p style="margin: 20px 0;">Please contact the client to confirm the appointment time. You can reply to this email or call them at ${booking.phone}.</p>
+            <div style="background-color: #e3f2fd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2196f3;">
+                <p style="margin: 0; font-weight: bold; color: #0d47a1;">📋 Next Steps:</p>
+                <p style="margin: 8px 0 0 0; color: #0d47a1; font-size: 14px;">
+                    1. Check for £10 bank transfer with reference: ${booking.fullName.split(' ')[0]}-${booking.preferredDate}<br>
+                    2. Once received, contact client to confirm appointment<br>
+                    3. Client contact: ${booking.phone} / ${booking.email}
+                </p>
+            </div>
 
             <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
 
@@ -84,9 +96,14 @@ async function sendCustomerConfirmationEmail(booking) {
     
     const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #d4af37;">Booking Confirmed! ✨</h2>
+            <h2 style="color: #d4af37;">Booking Request Received! ✨</h2>
             <p>Hi ${booking.fullName},</p>
-            <p>Thank you for booking with <strong>Slayed by Yili</strong>! Your appointment is confirmed.</p>
+            <p>Thank you for booking with <strong>Slayed by Yili</strong>!</p>
+            
+            <div style="background-color: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #d4af37;">
+                <h3 style="color: #856404; margin-top: 0;">⏳ Booking Pending Deposit</h3>
+                <p style="margin: 0;">Your booking will be confirmed once we receive your £10 deposit via bank transfer.</p>
+            </div>
             
             <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
                 <h3 style="color: #0a0a0a; margin-top: 0;">Your Appointment Details</h3>
@@ -95,13 +112,25 @@ async function sendCustomerConfirmationEmail(booking) {
                 <p><strong>💇 Hairstyle:</strong> ${booking.hairstyle}</p>
                 <p><strong>📏 Length:</strong> ${booking.length}</p>
                 <p><strong>💷 Total Price:</strong> £${booking.totalPrice}.00</p>
-                <p><strong>✅ Deposit Paid:</strong> £${booking.depositPaid}.00 (deducted from final price)</p>
+                <p><strong>💳 Deposit Required:</strong> £10.00</p>
             </div>
 
-            <p style="margin: 20px 0;">Yili will send you a confirmation message shortly to confirm the appointment time. If you have any special requests, please reply to this email or contact us directly.</p>
+            <div style="background-color: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4caf50;">
+                <h3 style="color: #2e7d32; margin-top: 0;">💰 Bank Transfer Details</h3>
+                <p style="margin: 8px 0;"><strong>Account Name:</strong> [Your Business Name]</p>
+                <p style="margin: 8px 0;"><strong>Sort Code:</strong> [Your Sort Code]</p>
+                <p style="margin: 8px 0;"><strong>Account Number:</strong> [Your Account Number]</p>
+                <p style="margin: 8px 0;"><strong>Amount:</strong> £10.00</p>
+                <p style="margin: 8px 0;"><strong>Reference:</strong> ${booking.fullName.split(' ')[0]}-${booking.preferredDate}</p>
+            </div>
+
+            <div style="background-color: #fff; padding: 15px; border: 2px solid #d4af37; border-radius: 8px; margin: 20px 0;">
+                <p style="margin: 0; font-weight: bold; color: #0a0a0a;">📌 Important:</p>
+                <p style="margin: 10px 0 0 0;">Please send the £10 deposit within 24 hours to secure your appointment. Once received, you'll get a confirmation email and Yili will contact you directly.</p>
+            </div>
 
             <div style="margin: 30px 0; padding: 20px; border-top: 2px solid #d4af37; border-bottom: 2px solid #d4af37;">
-                <h3 style="color: #0a0a0a;">What's Next?</h3>
+                <h3 style="color: #0a0a0a;">Need to Make Changes?</h3>
                 <p style="margin: 15px 0;">
                     <a href="${rescheduleLink}" style="background-color: #d4af37; color: #0a0a0a; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold; margin-right: 10px;">Reschedule Appointment</a>
                     <a href="${cancelLink}" style="background-color: #ff6b6b; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold;">Cancel Booking</a>
@@ -109,7 +138,7 @@ async function sendCustomerConfirmationEmail(booking) {
             </div>
 
             <p style="font-size: 12px; color: #666;">
-                <strong>Cancellation Policy:</strong> You can cancel free of charge more than 24 hours before your appointment. Cancellations within 24 hours may incur a £5 fee.
+                <strong>Cancellation Policy:</strong> Free cancellation more than 24 hours before your appointment. Cancellations within 24 hours may incur a £5 fee.
             </p>
 
             <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
