@@ -262,6 +262,259 @@ app.get('/api/booking/:id/:token', (req, res) => {
     }
 });
 
+// Serve reschedule page
+app.get('/reschedule-booking', (req, res) => {
+    const { id, token } = req.query;
+    
+    if (!id || !token) {
+        return res.status(400).send('Invalid reschedule link');
+    }
+    
+    const reschedulePage = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Reschedule Booking - Slayed by Yili</title>
+        <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+                color: #1a1a1a;
+                line-height: 1.6;
+                padding: 20px;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .container {
+                max-width: 600px;
+                background: white;
+                padding: 2rem;
+                border-radius: 8px;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+                border-top: 4px solid #d4af37;
+            }
+            h1 {
+                color: #d4af37;
+                margin-bottom: 1.5rem;
+                text-align: center;
+            }
+            .booking-details {
+                background: #f9f9f9;
+                padding: 1.5rem;
+                border-radius: 4px;
+                margin-bottom: 1.5rem;
+                border-left: 4px solid #d4af37;
+            }
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+            label {
+                display: block;
+                margin-bottom: 0.5rem;
+                color: #0a0a0a;
+                font-weight: 600;
+            }
+            select, input {
+                width: 100%;
+                padding: 0.75rem;
+                border: 2px solid #ddd;
+                border-radius: 4px;
+                font-size: 1rem;
+                transition: border-color 0.3s;
+            }
+            select:focus, input:focus {
+                outline: none;
+                border-color: #d4af37;
+            }
+            button {
+                width: 100%;
+                padding: 1rem;
+                background: #d4af37;
+                color: #0a0a0a;
+                border: none;
+                border-radius: 4px;
+                font-size: 1.1rem;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+            button:hover {
+                background: #e8c547;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+            }
+            button:disabled {
+                background: #ccc;
+                cursor: not-allowed;
+                transform: none;
+            }
+            .message {
+                padding: 1rem;
+                border-radius: 4px;
+                margin-bottom: 1rem;
+                display: none;
+            }
+            .error {
+                background: #ffe0e0;
+                border-left: 4px solid #ff4444;
+                color: #cc0000;
+            }
+            .success {
+                background: #e0ffe0;
+                border-left: 4px solid #44ff44;
+                color: #008800;
+            }
+            .loading {
+                text-align: center;
+                padding: 2rem;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>📅 Reschedule Your Appointment</h1>
+            <div id="loadingMessage" class="loading">Loading booking details...</div>
+            <div id="rescheduleForm" style="display:none;">
+                <div class="booking-details" id="bookingDetails"></div>
+                <div id="message" class="message"></div>
+                <form id="rescheduleFormElement">
+                    <div class="form-group">
+                        <label for="newDate">Select New Date:</label>
+                        <input type="date" id="newDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newTime">Select New Time:</label>
+                        <select id="newTime" required>
+                            <option value="">Choose a time</option>
+                        </select>
+                    </div>
+                    <button type="submit" id="submitBtn">Confirm Reschedule</button>
+                </form>
+            </div>
+        </div>
+        <script>
+            const bookingId = '${id}';
+            const token = '${token}';
+            let booking = null;
+
+            async function loadBooking() {
+                try {
+                    const response = await fetch(\`/api/bookings/\${bookingId}?token=\${token}\`);
+                    if (!response.ok) throw new Error('Booking not found');
+                    
+                    booking = await response.json();
+                    displayBooking(booking);
+                    await loadAvailableSlots();
+                    document.getElementById('loadingMessage').style.display = 'none';
+                    document.getElementById('rescheduleForm').style.display = 'block';
+                } catch (error) {
+                    document.getElementById('loadingMessage').innerHTML = '<p class="error">Error: ' + error.message + '</p>';
+                }
+            }
+
+            function displayBooking(booking) {
+                document.getElementById('bookingDetails').innerHTML = \`
+                    <h3>Current Appointment</h3>
+                    <p><strong>Hairstyle:</strong> \${booking.hairstyle}</p>
+                    <p><strong>Length:</strong> \${booking.length}</p>
+                    <p><strong>Current Date:</strong> \${booking.preferredDate}</p>
+                    <p><strong>Current Time:</strong> \${booking.preferredTime}</p>
+                    <p><strong>Total Price:</strong> £\${booking.totalPrice}.00</p>
+                \`;
+            }
+
+            async function loadAvailableSlots() {
+                try {
+                    const response = await fetch('/api/available-slots');
+                    const slots = await response.json();
+                    
+                    // Set min date to tomorrow
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    document.getElementById('newDate').min = tomorrow.toISOString().split('T')[0];
+                    
+                    // Populate available dates
+                    const uniqueDates = [...new Set(slots.map(s => s.date))];
+                    
+                    document.getElementById('newDate').addEventListener('change', (e) => {
+                        const selectedDate = e.target.value;
+                        const timesForDate = slots.filter(s => s.date === selectedDate);
+                        const timeSelect = document.getElementById('newTime');
+                        timeSelect.innerHTML = '<option value="">Choose a time</option>';
+                        timesForDate.forEach(slot => {
+                            timeSelect.innerHTML += \`<option value="\${slot.time}">\${slot.time}</option>\`;
+                        });
+                    });
+                } catch (error) {
+                    showMessage('Error loading available slots', 'error');
+                }
+            }
+
+            document.getElementById('rescheduleFormElement').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const newDate = document.getElementById('newDate').value;
+                const newTime = document.getElementById('newTime').value;
+                
+                if (!newDate || !newTime) {
+                    showMessage('Please select both date and time', 'error');
+                    return;
+                }
+                
+                const submitBtn = document.getElementById('submitBtn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Processing...';
+                
+                try {
+                    const response = await fetch('/api/reschedule-booking', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id: bookingId,
+                            token: token,
+                            newDate: newDate,
+                            newTime: newTime
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        showMessage('✅ Appointment rescheduled successfully! Check your email for confirmation.', 'success');
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 3000);
+                    } else {
+                        throw new Error(data.error || 'Reschedule failed');
+                    }
+                } catch (error) {
+                    showMessage('Error: ' + error.message, 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Confirm Reschedule';
+                }
+            });
+
+            function showMessage(msg, type) {
+                const messageDiv = document.getElementById('message');
+                messageDiv.textContent = msg;
+                messageDiv.className = 'message ' + type;
+                messageDiv.style.display = 'block';
+            }
+
+            loadBooking();
+        </script>
+    </body>
+    </html>
+    `;
+    
+    res.send(reschedulePage);
+});
+
 // Serve cancellation page
 app.get('/cancel-booking', (req, res) => {
     const { id, token } = req.query;
