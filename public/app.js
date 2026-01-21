@@ -490,13 +490,19 @@ async function handleBookingSubmit(e) {
     console.log('Sending booking data:', bookingData);
     
     try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+        
         const response = await fetch('/submit-booking', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(bookingData)
+            body: JSON.stringify(bookingData),
+            signal: controller.signal
         });
+        
+        clearTimeout(timeoutId);
         
         console.log('Response status:', response.status);
         
@@ -518,7 +524,13 @@ async function handleBookingSubmit(e) {
         openConfirmationModal();
     } catch (error) {
         console.error('Booking error:', error);
-        alert('Booking failed: ' + error.message + '\n\nPlease check your internet connection or try again later.');
+        let errorMsg = 'Booking failed: ';
+        if (error.name === 'AbortError') {
+            errorMsg += 'Request timed out. Server may be slow. Please try again.';
+        } else {
+            errorMsg += error.message + '\n\nPlease check your internet connection or try again later.';
+        }
+        alert(errorMsg);
         submitBtn.disabled = false;
         submitBtn.textContent = 'Confirm Booking';
     }
