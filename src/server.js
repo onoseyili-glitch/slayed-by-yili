@@ -5,7 +5,7 @@ const cors = require('cors');
 const path = require('path');
 const crypto = require('crypto');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const nodemailer = require('nodemailer');
+const { sendConfirmationEmail, sendCustomerConfirmationEmail } = require('./emailService');
 
 const app = express();
 
@@ -15,22 +15,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Email Transporter Configuration
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
-    },
-    connectionTimeout: 15000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
-    tls: {
-        rejectUnauthorized: false
-    }
-});
+
 
 // In-memory storage for bookings (replace with database in production)
 const bookings = [];
@@ -169,113 +154,10 @@ app.post('/submit-booking', async (req, res) => {
 });
 
 // Send confirmation email to business owner
-async function sendConfirmationEmail(booking) {
-    let addonsHTML = '';
-    if (booking.addons && booking.addons.length > 0) {
-        addonsHTML = '<p><strong>Add-ons:</strong></p><ul>';
-        booking.addons.forEach(addon => {
-            addonsHTML += `<li>${addon.name} — £${addon.price}.00</li>`;
-        });
-        addonsHTML += '</ul>';
-    }
-    
-    const emailContent = `
-        <h2>New Booking Confirmation</h2>
-        <p><strong>Client Name:</strong> ${booking.fullName}</p>
-        <p><strong>Phone Number:</strong> ${booking.phone}</p>
-        <p><strong>Email Address:</strong> ${booking.email}</p>
-        <hr>
-        <p><strong>Hairstyle:</strong> ${booking.hairstyle}</p>
-        <p><strong>Length:</strong> ${booking.length}</p>
-        <p><strong>Base Price:</strong> £${booking.price}.00</p>
-        ${addonsHTML}
-        ${booking.addonTotal > 0 ? `<p><strong>Add-ons Total:</strong> £${booking.addonTotal}.00</p>` : ''}
-        <p><strong>Total Price:</strong> £${booking.totalPrice}.00</p>
-        ${booking.depositPaid > 0 ? `<p><strong>Deposit Paid:</strong> £${booking.depositPaid}.00 (Non-refundable) — Deducted from final price</p>` : '<p><strong>No Deposit Required</strong> (Add-ons only)</p>'}
-        <hr>
-        <p><strong>Preferred Date:</strong> ${booking.preferredDate}</p>
-        <p><strong>Preferred Time:</strong> ${booking.preferredTime}</p>
-        <p><strong>Additional Notes:</strong> ${booking.notes}</p>
-        <hr>
-        <p><strong>Payment Intent ID:</strong> ${booking.paymentIntentId || 'N/A'}</p>
-        <p><strong>Booked At:</strong> ${booking.bookedAt}</p>
-        <p>Please contact the client to confirm the appointment time.</p>
-    `;
 
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: process.env.EMAIL_TO,
-        subject: `New Booking: ${booking.fullName} - ${booking.hairstyle}`,
-        html: emailContent
-    };
-
-    return new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => {
-            reject(new Error('Email send timeout'));
-        }, 10000);
-        
-        transporter.sendMail(mailOptions, (error, info) => {
-            clearTimeout(timeout);
-            if (error) {
-                console.error('Email sending error:', error);
-                reject(error);
-            } else {
-                console.log('Email sent:', info.response);
-                resolve(info);
-            }
-        });
-    });
-}
 
 // Send confirmation email to customer
-async function sendCustomerConfirmationEmail(booking) {
-    const cancellationLink = `${process.env.APP_URL || 'http://localhost:5000'}/cancel-booking?id=${booking.id}&token=${booking.cancellationToken}`;
-    
-    const emailContent = `
-        <h2>Your Booking is Confirmed!</h2>
-        <p>Hi ${booking.fullName},</p>
-        <p>Thank you for booking with Slayed by Yili!</p>
-        <hr>
-        <h3>Booking Details</h3>
-        <p><strong>Hairstyle:</strong> ${booking.hairstyle}</p>
-        <p><strong>Length:</strong> ${booking.length}</p>
-        <p><strong>Date:</strong> ${booking.preferredDate}</p>
-        <p><strong>Time:</strong> ${booking.preferredTime}</p>
-        <p><strong>Total Price:</strong> £${booking.price}.00</p>
-        <p><strong>Deposit Paid:</strong> £${booking.depositPaid}.00</p>
-        <hr>
-        <p>You'll receive a confirmation message from Yili to confirm your appointment.</p>
-        <p>Thank you for choosing Slayed by Yili!</p>
-        <hr>
-        <h3>Need to Cancel?</h3>
-        <p><a href="${cancellationLink}" style="background-color: #d4af37; color: #0a0a0a; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold;">Cancel Booking</a></p>
-        <p><small>You can cancel for free if you do so more than 24 hours before your appointment.</small></p>
-    `;
 
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: booking.email,
-        subject: 'Booking Confirmation - Slayed by Yili',
-        html: emailContent
-    };
-
-    return new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => {
-            reject(new Error('Email send timeout'));
-        }, 10000);
-        
-        transporter.sendMail(mailOptions, (error, info) => {
-            clearTimeout(timeout);
-            if (error) {
-                console.error('Customer email error:', error);
-                reject(error);
-            } else {
-                console.log('Customer email sent:', info.response);
-                resolve(info);
-            }
-        });
-    });
-}
 
 // Get all bookings (for admin dashboard - protect this in production)
 app.get('/api/bookings', (req, res) => {
@@ -1188,3 +1070,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Slayed by Yili server running on http://localhost:${PORT}`);
 });
+
