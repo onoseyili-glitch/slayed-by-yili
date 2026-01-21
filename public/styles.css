@@ -359,7 +359,6 @@ section h2 {
     background-color: rgba(212, 175, 55, 0.1);
     border-color: #e8c547;
 }
-}
 
 /* Length Options */
 .length-options {
@@ -827,7 +826,6 @@ section h2 {
     .tagline {
         font-size: 1rem;
     }
-    }
 
     .hero-logo {
         max-width: 350px;
@@ -901,10 +899,6 @@ section h2 {
 
     .nav-links {
         display: none;
-    }
-
-    .hero-content h1 {
-        font-size: 1.8rem;
     }
 
     .service-categories {
