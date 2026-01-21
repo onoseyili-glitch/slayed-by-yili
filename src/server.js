@@ -76,6 +76,7 @@ app.post('/create-payment-intent', async (req, res) => {
 // Submit Booking
 app.post('/submit-booking', async (req, res) => {
     try {
+        console.log('📧 EMAIL ROUTE HIT');
         const {
             fullName,
             phone,
