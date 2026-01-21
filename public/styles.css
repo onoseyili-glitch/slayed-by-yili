@@ -245,7 +245,9 @@ section h2 {
 
 /* Services Section */
 .services {
-    background-color: white;
+    background-color: #ffffff;
+    position: relative;
+    z-index: 1;
 }
 
 .service-categories {
@@ -261,6 +263,9 @@ section h2 {
     cursor: pointer;
     transition: all 0.3s ease, box-shadow 0.3s ease;
     border: 2px solid var(--border);
+        position: relative;
+        z-index: 2;
+        opacity: 1;
     text-align: center;
 }
 
