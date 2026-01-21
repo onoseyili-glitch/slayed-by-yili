@@ -110,12 +110,42 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     loadBlockedDates();
     
-    // Check if this is a reschedule request
+    // Check if returning from payment
     const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('payment') === 'success') {
+        handlePaymentReturn();
+        return;
+    }
+    
+    // Check if this is a reschedule request
     if (urlParams.get('reschedule') === 'true') {
         handleRescheduleFlow();
     }
 });
+
+function handlePaymentReturn() {
+    // Check if we have saved booking state
+    const savedState = sessionStorage.getItem('bookingState');
+    const paymentPending = sessionStorage.getItem('paymentPending');
+    
+    if (savedState && paymentPending === 'true') {
+        // Restore the booking state
+        currentState = JSON.parse(savedState);
+        
+        // Clear the payment pending flag
+        sessionStorage.removeItem('paymentPending');
+        
+        // Clear URL parameters
+        window.history.replaceState({}, document.title, '/');
+        
+        // Show success message and open time slot modal
+        alert('✅ Payment successful! Please select your appointment date and time.');
+        openTimeSlotModal();
+    } else {
+        // No saved state, redirect to home
+        window.location.href = '/';
+    }
+}
 
 async function loadBlockedDates() {
     try {
@@ -322,12 +352,13 @@ function proceedToPayment() {
         return;
     }
     
-    // All other services require Square deposit payment
-    window.open('https://square.link/u/0f0lHs5y', '_blank');
-    // Show time slot selection after a brief delay to allow user to complete payment
-    setTimeout(() => {
-        openTimeSlotModal();
-    }, 500);
+    // Save booking state to sessionStorage before redirecting to payment
+    sessionStorage.setItem('bookingState', JSON.stringify(currentState));
+    sessionStorage.setItem('paymentPending', 'true');
+    
+    // Redirect to Square payment with return URL
+    const returnUrl = encodeURIComponent(window.location.origin + '/?payment=success');
+    window.location.href = `https://square.link/u/0f0lHs5y?return_url=${returnUrl}`;
 }
 
 function openTimeSlotModal() {
