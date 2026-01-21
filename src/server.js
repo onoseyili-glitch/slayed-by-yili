@@ -134,18 +134,23 @@ app.post('/submit-booking', async (req, res) => {
 
         // Send emails asynchronously without blocking
         setImmediate(async () => {
+            console.log('Starting email send for booking:', booking.id);
             try {
                 await sendConfirmationEmail(booking);
+                console.log('Owner confirmation email sent successfully');
             } catch (emailError) {
-                console.error('Failed to send confirmation email:', emailError);
+                console.error('Failed to send confirmation email:', emailError.message);
             }
 
             if (email) {
                 try {
                     await sendCustomerConfirmationEmail(booking);
+                    console.log('Customer confirmation email sent successfully');
                 } catch (emailError) {
-                    console.error('Failed to send customer email:', emailError);
+                    console.error('Failed to send customer email:', emailError.message);
                 }
+            } else {
+                console.log('No customer email provided, skipping customer notification');
             }
         });
     } catch (error) {
