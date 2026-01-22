@@ -4,36 +4,33 @@ const services = {
         name: 'Braids',
         description: 'Professional braiding styles',
         hairstyles: [
-            { name: 'Knotless', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
+            { name: 'Knotless', pricing: { short: 50, medium: 60, long: 70, extra: 80 } },
             { name: 'Box', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
             { name: 'Fulani', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
-            { name: 'Feed-in', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
-            { name: 'Jumbo', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
-            { name: 'Boho', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
-            { name: 'Invisible', pricing: { short: 45, medium: 55, long: 65, extra: 75 } }
+            { name: 'Jumbo', pricing: { short: 40, medium: 50, long: 60, extra: 70 } },
+            { name: 'Boho', pricing: { short: 50, medium: 60, long: 70, extra: 80 } }
         ]
     },
     twists: {
         name: 'Twists',
         description: 'Stylish twist variations',
         hairstyles: [
-            { name: 'Passion', pricing: { short: 40, medium: 50, long: 60, extra: 70 } },
-            { name: 'Spring', pricing: { short: 40, medium: 50, long: 60, extra: 70 } },
-            { name: 'Mini', pricing: { short: 40, medium: 50, long: 60, extra: 70 } },
+            { name: 'Passion', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
+            { name: 'Spring', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
+            { name: 'Mini', pricing: { short: 50, medium: 60, long: 70, extra: 80 } },
             { name: 'Rope', pricing: { short: 40, medium: 50, long: 60, extra: 70 } },
-            { name: 'Two-Strand', pricing: { short: 40, medium: 50, long: 60, extra: 70 } },
-            { name: 'Patching', pricing: { short: 40, medium: 50, long: 60, extra: 70 } }
+            { name: 'Two-Strand (Natural Hair)', pricing: { short: 30, medium: 35, long: 40 } }
         ]
     },
     locstyles: {
-        name: 'Loc Styles (Pre-made / Install Only)',
-        description: 'Beautiful locs and loc variations - Pre-made hair',
+        name: 'Loc Styles (Install Only)',
+        description: 'Beautiful locs and loc variations',
         hairstyles: [
             { name: 'Butterfly', pricing: { short: 35, medium: 45, long: 55, extra: 65 } },
             { name: 'Soft', pricing: { short: 35, medium: 45, long: 55, extra: 65 } },
-            { name: 'Faux', pricing: { short: 35, medium: 45, long: 55, extra: 65 } },
-            { name: 'Goddess', pricing: { short: 35, medium: 45, long: 55, extra: 65 } },
-            { name: 'Sister Locs', pricing: { short: 35, medium: 45, long: 55, extra: 65 } }
+            { name: 'Faux', pricing: { short: 40, medium: 50, long: 60, extra: 70 } },
+            { name: 'Goddess', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
+            { name: 'Invisible', pricing: { short: 45, medium: 55, long: 65, extra: 75 } }
         ]
     },
     cornrows: {
@@ -41,8 +38,8 @@ const services = {
         description: 'Classic and creative cornrow designs',
         hairstyles: [
             { name: 'Straight-back', pricing: { short: 25, medium: 30, long: 35 } },
-            { name: 'Fulani', pricing: { short: 25, medium: 30, long: 35 } },
-            { name: 'Curved', pricing: { short: 25, medium: 30, long: 35 } }
+            { name: 'Fulani Cornrows', pricing: { short: 30, medium: 35, long: 40 } },
+            { name: 'Curved / Simple Designs', pricing: { short: 30, medium: 35, long: 40 } }
         ]
     },
     naturalhair: {
@@ -65,10 +62,10 @@ const services = {
         name: 'Kids Styles (Under 12)',
         description: 'Fun and protective styles for kids',
         hairstyles: [
-            { name: 'Braids', pricing: { short: 20, medium: 25, long: 30 } },
-            { name: 'Beaded Braids', pricing: { short: 20, medium: 25, long: 30 } },
-            { name: 'Natural Styles', pricing: { short: 20, medium: 25, long: 30 } },
-            { name: 'Cornrows', pricing: { short: 20, medium: 25, long: 30 } }
+            { name: 'Kids Braids', pricing: { short: 20, medium: 25, long: 30 } },
+            { name: 'Beaded Braids', pricing: { short: 25, medium: 30, long: 35 } },
+            { name: 'Kids Cornrows', pricing: { short: 20, medium: 25, long: 30 } },
+            { name: 'Kids Natural Styles', pricing: { fixed: 15 } }
         ]
     }
 };
