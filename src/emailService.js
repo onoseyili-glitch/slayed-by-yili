@@ -153,7 +153,7 @@ async function sendCustomerConfirmationEmail(booking) {
     const msg = {
         to: booking.email,
         from: process.env.EMAIL_USER,
-        subject: '✨ Your Booking is Confirmed - Slayed by Yili',
+        subject: `Appointment ${booking.preferredDate} - Payment Details`,
         html: emailContent
     };
 
