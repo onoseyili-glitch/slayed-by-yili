@@ -133,8 +133,6 @@ async function sendConfirmationEmail(booking) {
             }
         ]
     };
-        html: emailContent
-    };
 
     await sgMail.send(msg);
 }
