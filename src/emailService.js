@@ -175,6 +175,7 @@ async function sendCustomerConfirmationEmail(booking) {
                 <p><strong>📏 Length:</strong> ${booking.length}</p>
                 <p><strong>💷 Total Price:</strong> £${booking.totalPrice}.00</p>
                 <p><strong>💳 Deposit Required:</strong> £10.00</p>
+                <p style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;"><strong>📍 Location:</strong><br><strong style="font-size: 1.1em;">No 2 Aln Street<br>Hebburn<br>NE31 1XS</strong></p>
             </div>
 
             <div style="background-color: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4caf50;">
