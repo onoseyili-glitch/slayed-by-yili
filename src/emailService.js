@@ -5,6 +5,44 @@ if (process.env.SENDGRID_API_KEY) {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 }
 
+// Helper function to generate .ics calendar file content
+function generateCalendarInvite(booking) {
+    const startDate = new Date(`${booking.preferredDate}T${booking.preferredTime}:00`);
+    const endDate = new Date(startDate.getTime() + (3 * 60 * 60 * 1000)); // 3 hours later
+    
+    // Format dates for iCalendar (YYYYMMDDTHHMMSSZ)
+    const formatDate = (date) => {
+        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    };
+    
+    const icsContent = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Slayed by Yili//Booking System//EN',
+        'CALSCALE:GREGORIAN',
+        'METHOD:REQUEST',
+        'BEGIN:VEVENT',
+        `UID:${booking.id}@slayedbyyili`,
+        `DTSTAMP:${formatDate(new Date())}`,
+        `DTSTART:${formatDate(startDate)}`,
+        `DTEND:${formatDate(endDate)}`,
+        `SUMMARY:${booking.hairstyle} - ${booking.fullName}`,
+        `DESCRIPTION:Client: ${booking.fullName}\\nPhone: ${booking.phone}\\nEmail: ${booking.email}\\nStyle: ${booking.hairstyle} (${booking.length})\\nPrice: £${booking.totalPrice}\\nDeposit: £10 (awaiting)\\nBalance due: £${booking.totalPrice - 10}`,
+        `LOCATION:Your Salon Location`,
+        'STATUS:TENTATIVE',
+        'SEQUENCE:0',
+        'BEGIN:VALARM',
+        'TRIGGER:-PT1H',
+        'DESCRIPTION:Appointment in 1 hour',
+        'ACTION:DISPLAY',
+        'END:VALARM',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ].join('\r\n');
+    
+    return Buffer.from(icsContent).toString('base64');
+}
+
 async function sendConfirmationEmail(booking) {
     if (!process.env.SENDGRID_API_KEY) {
         console.log('⚠️ SENDGRID_API_KEY not set - email not sent');
@@ -65,6 +103,13 @@ async function sendConfirmationEmail(booking) {
                 </p>
             </div>
 
+            <div style="background-color: #dcfce7; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #16a34a;">
+                <p style="margin: 0; font-weight: bold; color: #15803d;">📅 Calendar Attached</p>
+                <p style="margin: 8px 0 0 0; color: #15803d; font-size: 14px;">
+                    Tap the calendar file attached to this email to add the appointment to your phone calendar automatically!
+                </p>
+            </div>
+
             <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
 
             <p style="font-size: 12px; color: #666;">
@@ -78,6 +123,16 @@ async function sendConfirmationEmail(booking) {
         to: process.env.EMAIL_TO,
         from: process.env.EMAIL_USER,
         subject: `New Booking: ${booking.fullName} - ${booking.hairstyle} on ${booking.preferredDate}`,
+        html: emailContent,
+        attachments: [
+            {
+                content: generateCalendarInvite(booking),
+                filename: `booking-${booking.fullName.replace(/\s+/g, '-')}-${booking.preferredDate}.ics`,
+                type: 'text/calendar',
+                disposition: 'attachment'
+            }
+        ]
+    };
         html: emailContent
     };
 
