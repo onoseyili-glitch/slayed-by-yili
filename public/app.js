@@ -130,6 +130,16 @@ function setupEventListeners() {
     if (bookingForm) {
         bookingForm.addEventListener('submit', handleBookingSubmit);
     }
+    
+    // Close modal when clicking policies link in checkbox
+    const policyLinks = document.querySelectorAll('a[href="#policies"]');
+    policyLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Close any open modals
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => modal.classList.add('hidden'));
+        });
+    });
 }
 
 function renderServiceCategories() {
