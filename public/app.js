@@ -453,6 +453,13 @@ function closeBookingModal() {
 async function handleBookingSubmit(e) {
     e.preventDefault();
     
+    // Check if policy agreement checkbox is checked
+    const policyCheckbox = document.getElementById('policyAgreement');
+    if (!policyCheckbox.checked) {
+        alert('Please confirm that you have read and agree to all booking policies before proceeding.');
+        return;
+    }
+    
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Processing...';
