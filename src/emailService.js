@@ -130,15 +130,14 @@ async function sendCustomerConfirmationEmail(booking) {
             </div>
 
             <div style="margin: 30px 0; padding: 20px; border-top: 2px solid #d4af37; border-bottom: 2px solid #d4af37;">
-                <h3 style="color: #0a0a0a;">Need to Make Changes?</h3>
+                <h3 style="color: #0a0a0a;">Need to Cancel or Reschedule?</h3>
                 <p style="margin: 15px 0;">
-                    <a href="${rescheduleLink}" style="background-color: #d4af37; color: #0a0a0a; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold; margin-right: 10px;">Reschedule Appointment</a>
-                    <a href="${cancelLink}" style="background-color: #ff6b6b; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold;">Cancel Booking</a>
+                    <a href="${cancelLink}" style="background-color: #ff6b6b; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold;">Cancel or Reschedule Booking</a>
                 </p>
             </div>
 
             <p style="font-size: 12px; color: #666;">
-                <strong>Cancellation Policy:</strong> Free cancellation more than 24 hours before your appointment. Cancellations within 24 hours may incur a £5 fee.
+                <strong>Cancellation Policy:</strong> £10 deposit is non-refundable. Cancellations within 24 hours of appointment may incur an additional £5 fee.
             </p>
 
             <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
@@ -185,18 +184,20 @@ async function sendCancellationConfirmationEmail(booking, hoursUntilAppointment,
                 <p><strong>⚠️ Cancellation Fee:</strong> £5.00</p>
                 <p style="color: #ff6b6b;"><strong>Status:</strong> Awaiting fee payment</p>
                 <p>You cancelled less than 24 hours before your appointment. A £5 cancellation fee applies. Your cancellation will be confirmed after payment is processed.</p>
+                <p><strong>Important:</strong> The original £10 deposit is non-refundable.</p>
         `;
     } else {
         emailContent += `
-                <p style="color: #4caf50;"><strong>✅ Status:</strong> Cancellation Confirmed (FREE)</p>
-                <p>You cancelled more than 24 hours before your appointment. No cancellation fee applies. Your deposit of £${booking.depositPaid}.00 will be refunded within 5-7 business days.</p>
+                <p style="color: #4caf50;"><strong>✅ Status:</strong> Cancellation Confirmed</p>
+                <p>You cancelled more than 24 hours before your appointment. No additional cancellation fee applies.</p>
+                <p><strong>Important:</strong> The £10 deposit is non-refundable as per our cancellation policy.</p>
         `;
     }
     
     emailContent += `
             </div>
 
-            <p style="margin: 20px 0;">Yili will confirm your cancellation and process your refund accordingly. If you have any questions, please contact us.</p>
+            <p style="margin: 20px 0;">Yili will confirm your cancellation. If you have any questions, please contact us.</p>
 
             <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
 

@@ -861,7 +861,8 @@ app.get('/cancel-booking', (req, res) => {
                         document.getElementById('content').innerHTML = \`
                             <div class="success">
                                 <h3>✓ Cancellation Submitted</h3>
-                                <p>\${data.message}</p>
+                                <p>Your booking has been cancelled successfully.</p>
+                                <p style="margin-top: 1rem; font-size: 0.95rem;"><strong>Please note:</strong> The £10 deposit is non-refundable as per our cancellation policy.</p>
                                 <p style="margin-top: 1rem; font-size: 0.95rem;">Yili will confirm your cancellation. A confirmation email has been sent to the address on file.</p>
                             </div>
                         \`;
