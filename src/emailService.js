@@ -10,27 +10,37 @@ function generateCalendarInvite(booking) {
     const startDate = new Date(`${booking.preferredDate}T${booking.preferredTime}:00`);
     const endDate = new Date(startDate.getTime() + (3 * 60 * 60 * 1000)); // 3 hours later
     
-    // Format dates for iCalendar (YYYYMMDDTHHMMSSZ)
+    // Format dates for iCalendar (YYYYMMDDTHHMMSS in local time)
     const formatDate = (date) => {
-        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        return `${year}${month}${day}T${hours}${minutes}${seconds}`;
     };
+    
+    const now = new Date();
+    const description = `Client: ${booking.fullName}\\nPhone: ${booking.phone}\\nEmail: ${booking.email}\\nStyle: ${booking.hairstyle} (${booking.length})\\nPrice: £${booking.totalPrice}\\nDeposit: £10 (awaiting)\\nBalance due: £${booking.totalPrice - 10}`;
     
     const icsContent = [
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
         'PRODID:-//Slayed by Yili//Booking System//EN',
         'CALSCALE:GREGORIAN',
-        'METHOD:REQUEST',
+        'METHOD:PUBLISH',
         'BEGIN:VEVENT',
-        `UID:${booking.id}@slayedbyyili`,
-        `DTSTAMP:${formatDate(new Date())}`,
+        `UID:booking-${booking.id}-${Date.now()}@slayedbyyili.com`,
+        `DTSTAMP:${formatDate(now)}`,
         `DTSTART:${formatDate(startDate)}`,
         `DTEND:${formatDate(endDate)}`,
         `SUMMARY:${booking.hairstyle} - ${booking.fullName}`,
-        `DESCRIPTION:Client: ${booking.fullName}\\nPhone: ${booking.phone}\\nEmail: ${booking.email}\\nStyle: ${booking.hairstyle} (${booking.length})\\nPrice: £${booking.totalPrice}\\nDeposit: £10 (awaiting)\\nBalance due: £${booking.totalPrice - 10}`,
-        `LOCATION:Your Salon Location`,
-        'STATUS:TENTATIVE',
+        `DESCRIPTION:${description}`,
+        'LOCATION:Slayed by Yili Salon',
+        'STATUS:CONFIRMED',
         'SEQUENCE:0',
+        'PRIORITY:5',
         'BEGIN:VALARM',
         'TRIGGER:-PT1H',
         'DESCRIPTION:Appointment in 1 hour',
@@ -42,6 +52,7 @@ function generateCalendarInvite(booking) {
     
     return Buffer.from(icsContent).toString('base64');
 }
+
 
 async function sendConfirmationEmail(booking) {
     if (!process.env.SENDGRID_API_KEY) {
