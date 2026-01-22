@@ -8,7 +8,6 @@ if (process.env.SENDGRID_API_KEY) {
 // Helper function to generate .ics calendar file content
 function generateCalendarInvite(booking) {
     const startDate = new Date(`${booking.preferredDate}T${booking.preferredTime}:00`);
-    const endDate = new Date(startDate.getTime() + (3 * 60 * 60 * 1000)); // 3 hours later
     
     // Format dates for iCalendar (YYYYMMDDTHHMMSS in local time)
     const formatDate = (date) => {
@@ -34,7 +33,6 @@ function generateCalendarInvite(booking) {
         `UID:booking-${booking.id}-${Date.now()}@slayedbyyili.com`,
         `DTSTAMP:${formatDate(now)}`,
         `DTSTART:${formatDate(startDate)}`,
-        `DTEND:${formatDate(endDate)}`,
         `SUMMARY:${booking.hairstyle} - ${booking.fullName}`,
         `DESCRIPTION:${description}`,
         'LOCATION:Slayed by Yili Salon',
