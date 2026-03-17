@@ -206,7 +206,10 @@
                 <!-- Time slots will be populated by JavaScript -->
             </div>
             <p id="bookingMessage" style="margin-top: 1rem; text-align: center; color: #d4af37;"></p>
-            <button class="btn btn-primary btn-block" id="confirmTimeBtn" onclick="confirmTimeSlot()" style="margin-top: 1rem;">Continue to Booking Form</button>
+            <div class="modal-actions" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1rem;">
+                <button class="btn btn-secondary btn-block" type="button" onclick="goBackToPricing()">Back</button>
+                <button class="btn btn-primary btn-block" id="confirmTimeBtn" onclick="confirmTimeSlot()">Continue to Booking Form</button>
+            </div>
         </div>
     </div>
 
@@ -381,6 +384,7 @@
     <footer class="footer">
         <div class="container">
             <p>&copy; 2026 Slayed by Yili. All rights reserved. Professional hair styling for everyone.</p>
+            <p class="footer-verse">“For I know the plans I have for you,” declares the LORD, “plans to prosper you and not to harm you, plans to give you hope and a future.” — <strong>Jeremiah 29:11</strong></p>
         </div>
     </footer>
 

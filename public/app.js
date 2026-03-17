@@ -107,14 +107,40 @@ let stripe, cardElement;
 document.addEventListener('DOMContentLoaded', function() {
     renderServiceCategories();
     setupEventListeners();
+    setupAnchorScroll();
     loadBlockedDates();
-    
+    handleInitialHash();
+
     // Check if this is a reschedule request
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('reschedule') === 'true') {
         handleRescheduleFlow();
     }
 });
+
+function handleInitialHash() {
+    if (window.location.hash) {
+        const targetId = window.location.hash.slice(1);
+        // Delay slightly to allow page to render before scrolling
+        setTimeout(() => scrollToSection(targetId), 50);
+    }
+}
+
+window.addEventListener('hashchange', () => {
+    const targetId = window.location.hash.slice(1);
+    scrollToSection(targetId);
+});
+
+function setupAnchorScroll() {
+    const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+    navLinks.forEach(link => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            const targetId = link.getAttribute('href').slice(1);
+            scrollToSection(targetId);
+        });
+    });
+}
 
 async function loadBlockedDates() {
     try {
@@ -178,7 +204,8 @@ function openServiceModal(categoryKey, categoryData) {
         };
         optionsContainer.appendChild(btn);
     });
-    
+
+    document.body.style.overflow = 'hidden';
     modal.classList.remove('hidden');
 }
 
@@ -204,6 +231,7 @@ function openLengthModal() {
         return;
     }
     
+    document.body.style.overflow = 'hidden';
     modal.classList.remove('hidden');
     
     // Get available lengths from pricing data
@@ -258,6 +286,7 @@ function selectLength(length) {
 }
 
 function openPricingModal() {
+    document.body.style.overflow = 'hidden';
     document.getElementById('summaryHairstyle').textContent = currentState.selectedHairstyle;
     document.getElementById('summaryLength').textContent = currentState.selectedLength;
     document.getElementById('summaryPrice').textContent = currentState.price;
@@ -328,8 +357,14 @@ function proceedToPayment() {
     openTimeSlotModal();
 }
 
+function goBackToPricing() {
+    closeTimeSlotModal();
+    openPricingModal();
+}
+
 function openTimeSlotModal() {
     const modal = document.getElementById('timeSlotModal');
+    document.body.style.overflow = 'hidden';
     modal.classList.remove('hidden');
     
     // Set minimum date to today
@@ -566,8 +601,21 @@ function resetBookingFlow() {
     document.getElementById('bookingForm').reset();
 }
 
+function scrollToSection(id) {
+    const element = document.getElementById(id);
+    if (!element) return;
+
+    const header = document.querySelector('.navbar');
+    const headerHeight = header ? header.offsetHeight : 0;
+
+    const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
+    const offsetTop = elementTop - headerHeight - 10; // small gap
+
+    window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+}
+
 function scrollToServices() {
-    document.getElementById('services').scrollIntoView({ behavior: 'smooth' });
+    scrollToSection('services');
 }
 
 // Reschedule booking flow
