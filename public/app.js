@@ -8,7 +8,7 @@ const services = {
             { name: 'Box', pricing: { short: 35, medium: 45, long: 55, extra: 65 } },
             { name: 'Fulani', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
             { name: 'Jumbo', pricing: { short: 25, medium: 30, long: 35, extra: 40 } },
-            { name: 'Boho', pricing: { short: 50, medium: 60, long: 70, extra: 80 } }
+            { name: 'Boho', pricing: { short: 40, medium: 45, long: 55, extra: 60 } },
         ]
     },
     twists: {
