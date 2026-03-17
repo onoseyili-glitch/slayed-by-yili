@@ -4,10 +4,10 @@ const services = {
         name: 'Braids',
         description: 'Professional braiding styles',
         hairstyles: [
-            { name: 'Knotless', pricing: { short: 50, medium: 60, long: 70, extra: 80 } },
-            { name: 'Box', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
+            { name: 'Knotless', pricing: { short: 40, medium: 50, long: 60, extra: 70 } },
+            { name: 'Box', pricing: { short: 35, medium: 45, long: 55, extra: 65 } },
             { name: 'Fulani', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
-            { name: 'Jumbo', pricing: { short: 40, medium: 50, long: 60, extra: 70 } },
+            { name: 'Jumbo', pricing: { short: 25, medium: 30, long: 35, extra: 40 } },
             { name: 'Boho', pricing: { short: 50, medium: 60, long: 70, extra: 80 } }
         ]
     },
@@ -16,30 +16,32 @@ const services = {
         description: 'Stylish twist variations',
         hairstyles: [
             { name: 'Passion', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
-            { name: 'Spring', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
+            { name: 'Spring', pricing: { short: 50, medium: 60, long: 70, extra: 80 } },
             { name: 'Mini', pricing: { short: 50, medium: 60, long: 70, extra: 80 } },
-            { name: 'Rope', pricing: { short: 40, medium: 50, long: 60, extra: 70 } },
-            { name: 'Two-Strand (Natural Hair)', pricing: { short: 30, medium: 35, long: 40 } }
+            { name: 'Rope', pricing: { fixed: 40 } },
+            { name: 'Island Twists', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
+            { name: 'Kinky Twists', pricing: { short: 35, medium: 40, long: 50 } },
+            { name: 'Two-Strand (Natural Hair)', pricing: { fixed: 30 } }
         ]
     },
     locstyles: {
         name: 'Loc Styles (Install Only)',
         description: 'Beautiful locs and loc variations',
         hairstyles: [
-            { name: 'Butterfly', pricing: { short: 35, medium: 45, long: 55, extra: 65 } },
-            { name: 'Soft', pricing: { short: 35, medium: 45, long: 55, extra: 65 } },
-            { name: 'Faux', pricing: { short: 40, medium: 50, long: 60, extra: 70 } },
-            { name: 'Goddess', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
-            { name: 'Invisible', pricing: { short: 45, medium: 55, long: 65, extra: 75 } }
+            { name: 'Butterfly', pricing: { fixed: 50 } },
+            { name: 'Soft', pricing: { fixed: 50 } },
+            { name: 'Faux', pricing: { fixed: 50 } },
+            { name: 'Goddess', pricing: { fixed: 50 } },
+            { name: 'Invisible', pricing: { fixed: 50 } }
         ]
     },
     cornrows: {
         name: 'Cornrows',
         description: 'Classic and creative cornrow designs',
         hairstyles: [
-            { name: 'Straight-back', pricing: { short: 25, medium: 30, long: 35 } },
-            { name: 'Fulani Cornrows', pricing: { short: 30, medium: 35, long: 40 } },
-            { name: 'Curved / Simple Designs', pricing: { short: 30, medium: 35, long: 40 } }
+            { name: 'Straight-back', pricing: { short: 15, medium: 20, long: 25 } },
+            { name: 'Fulani Cornrows', pricing: { fixed: 40 } },
+            { name: 'Curved / Simple Designs', pricing: { fixed: 35 } }
         ]
     },
     naturalhair: {
