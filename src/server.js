@@ -31,11 +31,48 @@ const bookings = [];
 // Availability configuration (stored in memory - use database for persistence)
 let blockedDates = [];
 
+// Admin session store (tokens issued on successful login)
+const adminSessions = new Set();
+
+function adminAuth(req, res, next) {
+    const auth = req.headers['authorization'] || '';
+    const token = auth.replace('Bearer ', '').trim();
+    if (!token || !adminSessions.has(token)) {
+        return res.status(401).json({ error: 'Unauthorised' });
+    }
+    next();
+}
+
 // Routes
 
 // Serve the main HTML file
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../views/index.html'));
+});
+
+// Admin dashboard
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, '../views/admin.html'));
+});
+
+// Admin login
+app.post('/admin/login', (req, res) => {
+    const { password } = req.body;
+    const adminPassword = process.env.ADMIN_PASSWORD || 'yili2026';
+    if (password !== adminPassword) {
+        return res.status(401).json({ error: 'Incorrect password' });
+    }
+    const token = crypto.randomBytes(32).toString('hex');
+    adminSessions.add(token);
+    res.json({ token });
+});
+
+// Admin logout
+app.post('/admin/logout', (req, res) => {
+    const auth = req.headers['authorization'] || '';
+    const token = auth.replace('Bearer ', '').trim();
+    adminSessions.delete(token);
+    res.json({ success: true });
 });
 
 // Get Stripe public key
@@ -151,8 +188,8 @@ app.post('/submit-booking', async (req, res) => {
 // Send confirmation email to customer
 
 
-// Get all bookings (for admin dashboard - protect this in production)
-app.get('/api/bookings', (req, res) => {
+// Get all bookings (admin only)
+app.get('/api/bookings', adminAuth, (req, res) => {
     res.json(bookings);
 });
 
@@ -163,8 +200,8 @@ app.get('/api/availability', (req, res) => {
     });
 });
 
-// Add blocked date (for holidays, etc.)
-app.post('/api/blocked-dates', (req, res) => {
+// Add blocked date (admin only)
+app.post('/api/blocked-dates', adminAuth, (req, res) => {
     try {
         const { date } = req.body;
         
@@ -187,8 +224,8 @@ app.post('/api/blocked-dates', (req, res) => {
     }
 });
 
-// Remove blocked date
-app.delete('/api/blocked-dates/:date', (req, res) => {
+// Remove blocked date (admin only)
+app.delete('/api/blocked-dates/:date', adminAuth, (req, res) => {
     try {
         const { date } = req.params;
         

@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Slayed by Yili</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --gold: #d4af37;
+            --gold-hover: #e8c547;
+            --dark: #0a0a0a;
+            --dark2: #1a1a1a;
+            --dark3: #2a2a2a;
+            --text: #f5f5f5;
+            --text-muted: #aaa;
+            --pink: #f4a6c1;
+            --green: #4caf50;
+            --red: #e53935;
+            --border: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── LOGIN ── */
+        #loginScreen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .login-card {
+            background: var(--dark2);
+            border: 1px solid var(--gold);
+            border-top: 3px solid var(--gold);
+            border-radius: 8px;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+        }
+
+        .login-card h1 { font-size: 1.6rem; color: var(--gold); margin-bottom: .4rem; }
+        .login-card p  { color: var(--text-muted); font-size: .9rem; margin-bottom: 1.8rem; }
+
+        .login-card input {
+            width: 100%;
+            padding: .75rem 1rem;
+            background: var(--dark3);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            outline: none;
+            transition: border-color .2s;
+        }
+        .login-card input:focus { border-color: var(--gold); }
+
+        .login-card button {
+            width: 100%;
+            padding: .75rem;
+            background: var(--gold);
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .2s;
+        }
+        .login-card button:hover { background: var(--gold-hover); }
+
+        .login-error { color: var(--red); font-size: .85rem; margin-top: .6rem; }
+
+        /* ── DASHBOARD ── */
+        #dashboard { display: none; }
+
+        header {
+            background: var(--dark2);
+            border-bottom: 1px solid var(--border);
+            padding: .9rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 { font-size: 1.2rem; color: var(--gold); }
+        header span { font-size: .8rem; color: var(--text-muted); }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: .4rem .9rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: .85rem;
+            transition: border-color .2s, color .2s;
+        }
+        .logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+        main { padding: 1.5rem; max-width: 1100px; margin: 0 auto; }
+
+        /* ── STATS ── */
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+
+        .stat-card {
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            border-top: 3px solid var(--gold);
+            border-radius: 6px;
+            padding: 1.2rem 1rem;
+            text-align: center;
+        }
+        .stat-card .num { font-size: 2rem; font-weight: 700; color: var(--gold); }
+        .stat-card .lbl { font-size: .8rem; color: var(--text-muted); margin-top: .2rem; }
+
+        /* ── SECTION TITLES ── */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gold);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: .5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        /* ── BOOKINGS TABLE ── */
+        .bookings-section { margin-bottom: 2.5rem; }
+
+        .filter-bar {
+            display: flex;
+            gap: .6rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .filter-bar input,
+        .filter-bar select {
+            padding: .5rem .8rem;
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+            font-size: .85rem;
+            outline: none;
+        }
+        .filter-bar input:focus,
+        .filter-bar select:focus { border-color: var(--gold); }
+        .filter-bar input { flex: 1; min-width: 160px; }
+
+        .table-wrap { overflow-x: auto; border-radius: 6px; border: 1px solid var(--border); }
+
+        table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+
+        thead { background: var(--dark3); }
+        thead th {
+            padding: .75rem 1rem;
+            text-align: left;
+            color: var(--gold);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-top: 1px solid var(--border);
+            transition: background .15s;
+        }
+        tbody tr:hover { background: var(--dark2); }
+
+        td {
+            padding: .7rem 1rem;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: .2rem .55rem;
+            border-radius: 3px;
+            font-size: .75rem;
+            font-weight: 600;
+        }
+        .badge-confirmed  { background: #1b4332; color: #6fcf97; }
+        .badge-cancelled  { background: #4a1515; color: #f4a4a4; }
+        .badge-rescheduled { background: #1a3a5c; color: #90c8f8; }
+
+        .wa-btn {
+            display: inline-block;
+            padding: .3rem .7rem;
+            background: #1a5e38;
+            color: #6fcf97;
+            border-radius: 4px;
+            font-size: .75rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background .2s;
+        }
+        .wa-btn:hover { background: #25d366; color: #000; }
+
+        .empty-row td { text-align: center; color: var(--text-muted); padding: 2rem; }
+
+        /* ── BLOCKED DATES ── */
+        .blocked-section { margin-bottom: 2.5rem; }
+
+        .add-date-row {
+            display: flex;
+            gap: .6rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .add-date-row input[type="date"] {
+            padding: .55rem .8rem;
+            background: var(--dark2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+            font-size: .9rem;
+            outline: none;
+            flex: 1;
+            min-width: 160px;
+        }
+        .add-date-row input[type="date"]:focus { border-color: var(--gold); }
+
+        .btn-gold {
+            padding: .55rem 1.2rem;
+            background: var(--gold);
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: .9rem;
+            transition: background .2s;
+        }
+        .btn-gold:hover { background: var(--gold-hover); }
+
+        .blocked-list { display: flex; flex-wrap: wrap; gap: .6rem; }
+
+        .blocked-tag {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            background: var(--dark3);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: .4rem .75rem;
+            font-size: .9rem;
+        }
+
+        .remove-date {
+            background: none;
+            border: none;
+            color: var(--red);
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+            padding: 0;
+        }
+        .remove-date:hover { color: #ff6b6b; }
+
+        .no-blocked { color: var(--text-muted); font-size: .9rem; }
+
+        /* ── NOTICE ── */
+        .notice {
+            background: #1a2a1a;
+            border-left: 3px solid var(--green);
+            border-radius: 4px;
+            padding: .7rem 1rem;
+            font-size: .82rem;
+            color: #adc; 
+            margin-bottom: 1.5rem;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 600px) {
+            td, th { padding: .55rem .6rem; font-size: .8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="loginScreen">
+    <div class="login-card">
+        <h1>Slayed by Yili</h1>
+        <p>Admin dashboard — enter your password</p>
+        <input type="password" id="passwordInput" placeholder="Password" autocomplete="current-password">
+        <button onclick="doLogin()">Login</button>
+        <div class="login-error" id="loginError"></div>
+    </div>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div id="dashboard">
+    <header>
+        <div>
+            <h1>💇 Admin Dashboard</h1>
+            <span>Slayed by Yili</span>
+        </div>
+        <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </header>
+
+    <main>
+        <div class="notice">⚠️ Bookings are stored in memory — they reset when the server restarts. This will be fixed with a database later.</div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="num" id="statTotal">—</div>
+                <div class="lbl">Total Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="num" id="statUpcoming">—</div>
+                <div class="lbl">Upcoming</div>
+            </div>
+            <div class="stat-card">
+                <div class="num" id="statToday">—</div>
+                <div class="lbl">Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="num" id="statCancelled">—</div>
+                <div class="lbl">Cancelled</div>
+            </div>
+        </div>
+
+        <!-- Bookings -->
+        <div class="bookings-section">
+            <div class="section-title">All Bookings</div>
+
+            <div class="filter-bar">
+                <input type="text" id="searchInput" placeholder="Search name, style, phone…" oninput="filterBookings()">
+                <select id="statusFilter" onchange="filterBookings()">
+                    <option value="all">All statuses</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+                <select id="sortSelect" onchange="filterBookings()">
+                    <option value="newest">Newest first</option>
+                    <option value="oldest">Oldest first</option>
+                    <option value="date-asc">Appointment ↑</option>
+                    <option value="date-desc">Appointment ↓</option>
+                </select>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Style</th>
+                            <th>Length</th>
+                            <th>Price</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>WhatsApp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsBody">
+                        <tr class="empty-row"><td colspan="9">Loading…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Blocked Dates -->
+        <div class="blocked-section">
+            <div class="section-title">Block Dates</div>
+            <div class="add-date-row">
+                <input type="date" id="newBlockDate">
+                <button class="btn-gold" onclick="addBlockedDate()">Block Date</button>
+            </div>
+            <div class="blocked-list" id="blockedList">
+                <span class="no-blocked">Loading…</span>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    const YILI_WHATSAPP = '447500039928';
+    let allBookings = [];
+    let adminToken = localStorage.getItem('adminToken') || '';
+
+    // ── Auto-login on load ──
+    window.addEventListener('DOMContentLoaded', () => {
+        const dateInput = document.getElementById('newBlockDate');
+        dateInput.min = new Date().toISOString().split('T')[0];
+
+        document.getElementById('passwordInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') doLogin();
+        });
+
+        if (adminToken) verifyAndShow();
+    });
+
+    async function verifyAndShow() {
+        const res = await fetch('/api/bookings', {
+            headers: { Authorization: `Bearer ${adminToken}` }
+        });
+        if (res.ok) {
+            showDashboard();
+        } else {
+            adminToken = '';
+            localStorage.removeItem('adminToken');
+        }
+    }
+
+    // ── Login ──
+    async function doLogin() {
+        const password = document.getElementById('passwordInput').value.trim();
+        if (!password) return;
+
+        const res = await fetch('/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            adminToken = data.token;
+            localStorage.setItem('adminToken', adminToken);
+            document.getElementById('loginError').textContent = '';
+            showDashboard();
+        } else {
+            document.getElementById('loginError').textContent = 'Incorrect password. Try again.';
+        }
+    }
+
+    // ── Logout ──
+    async function doLogout() {
+        await fetch('/admin/logout', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${adminToken}` }
+        }).catch(() => {});
+        adminToken = '';
+        localStorage.removeItem('adminToken');
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('passwordInput').value = '';
+    }
+
+    // ── Show dashboard ──
+    function showDashboard() {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        loadBookings();
+        loadBlockedDates();
+    }
+
+    // ── Load bookings ──
+    async function loadBookings() {
+        const res = await fetch('/api/bookings', {
+            headers: { Authorization: `Bearer ${adminToken}` }
+        });
+        if (!res.ok) { doLogout(); return; }
+        allBookings = await res.json();
+        updateStats();
+        filterBookings();
+    }
+
+    function updateStats() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('statTotal').textContent = allBookings.length;
+        document.getElementById('statUpcoming').textContent = allBookings.filter(b => !b.cancelled && b.preferredDate >= today).length;
+        document.getElementById('statToday').textContent = allBookings.filter(b => !b.cancelled && b.preferredDate === today).length;
+        document.getElementById('statCancelled').textContent = allBookings.filter(b => b.cancelled).length;
+    }
+
+    function filterBookings() {
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const status = document.getElementById('statusFilter').value;
+        const sort = document.getElementById('sortSelect').value;
+
+        let list = allBookings.filter(b => {
+            const matchSearch = !search ||
+                (b.fullName || '').toLowerCase().includes(search) ||
+                (b.phone || '').includes(search) ||
+                (b.hairstyle || '').toLowerCase().includes(search);
+
+            const matchStatus = status === 'all' ||
+                (status === 'cancelled' && b.cancelled) ||
+                (status === 'confirmed' && !b.cancelled);
+
+            return matchSearch && matchStatus;
+        });
+
+        list.sort((a, b) => {
+            if (sort === 'newest') return b.id - a.id;
+            if (sort === 'oldest') return a.id - b.id;
+            const da = a.preferredDate + ' ' + a.preferredTime;
+            const db = b.preferredDate + ' ' + b.preferredTime;
+            if (sort === 'date-asc') return da.localeCompare(db);
+            return db.localeCompare(da);
+        });
+
+        renderBookings(list);
+    }
+
+    function renderBookings(list) {
+        const tbody = document.getElementById('bookingsBody');
+        if (!list.length) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="9">No bookings found</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = list.map(b => {
+            let statusBadge;
+            if (b.cancelled) {
+                statusBadge = '<span class="badge badge-cancelled">Cancelled</span>';
+            } else if (b.rescheduled) {
+                statusBadge = '<span class="badge badge-rescheduled">Rescheduled</span>';
+            } else {
+                statusBadge = '<span class="badge badge-confirmed">Confirmed</span>';
+            }
+
+            const msg = encodeURIComponent(
+                `Hi ${b.fullName} 💕 just following up on your booking with Slayed by Yili!\n\nAppointment: ${b.hairstyle} (${b.length})\nDate: ${b.preferredDate} at ${b.preferredTime}\n\nAny questions? Let me know! ✨`
+            );
+            const waLink = `https://wa.me/${normalizePhone(b.phone)}?text=${msg}`;
+
+            return `<tr>
+                <td>${esc(b.fullName)}</td>
+                <td>${esc(b.phone)}</td>
+                <td>${esc(b.hairstyle)}</td>
+                <td>${esc(b.length)}</td>
+                <td>£${b.totalPrice || b.price || '—'}</td>
+                <td>${esc(b.preferredDate)}</td>
+                <td>${esc(b.preferredTime)}</td>
+                <td>${statusBadge}</td>
+                <td><a class="wa-btn" href="${waLink}" target="_blank" rel="noopener noreferrer">WhatsApp</a></td>
+            </tr>`;
+        }).join('');
+    }
+
+    // ── Blocked dates ──
+    async function loadBlockedDates() {
+        const res = await fetch('/api/blocked-dates');
+        if (!res.ok) return;
+        const dates = await res.json();
+        renderBlockedDates(dates);
+    }
+
+    function renderBlockedDates(dates) {
+        const container = document.getElementById('blockedList');
+        if (!dates.length) {
+            container.innerHTML = '<span class="no-blocked">No dates blocked</span>';
+            return;
+        }
+        container.innerHTML = [...dates].sort().map(d => `
+            <div class="blocked-tag">
+                <span>${formatDate(d)}</span>
+                <button class="remove-date" onclick="removeBlockedDate('${d}')" title="Unblock">✕</button>
+            </div>
+        `).join('');
+    }
+
+    async function addBlockedDate() {
+        const input = document.getElementById('newBlockDate');
+        const date = input.value;
+        if (!date) return;
+
+        const res = await fetch('/api/blocked-dates', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${adminToken}`
+            },
+            body: JSON.stringify({ date })
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            renderBlockedDates(data.blockedDates);
+            input.value = '';
+        } else {
+            alert('Failed to block date. Please try again.');
+        }
+    }
+
+    async function removeBlockedDate(date) {
+        const res = await fetch(`/api/blocked-dates/${date}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${adminToken}` }
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            renderBlockedDates(data.blockedDates);
+        }
+    }
+
+    // ── Helpers ──
+    function esc(str) {
+        return String(str || '—')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
+    function normalizePhone(phone) {
+        if (!phone) return YILI_WHATSAPP;
+        const d = String(phone).replace(/\D/g, '');
+        if (d.startsWith('0')) return '44' + d.slice(1);
+        return d;
+    }
+
+    function formatDate(dateStr) {
+        try {
+            return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-GB', {
+                weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+            });
+        } catch { return dateStr; }
+    }
+</script>
+</body>
+</html>
