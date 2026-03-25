@@ -127,47 +127,18 @@ app.post('/submit-booking', async (req, res) => {
         // Store booking
         bookings.push(booking);
 
+        const yiliMsg = generateYiliBookingNotification(booking);
+        const yiliLink = getYiliWhatsAppLink(yiliMsg);
+
         // Send response immediately
         res.json({
             success: true,
             bookingId: booking.id,
-            message: 'Booking Confirmed!\n\nThank you for booking with Slayed by Yili.\n\nYou\'ll receive a WhatsApp message shortly with your booking details and bank transfer instructions.\n\nYour slot is only confirmed after deposit is sent.\n\nYou\'ll hear from Yili soon! ✨'
+            message: 'Booking Confirmed!\n\nYou are being redirected to WhatsApp now. Please tap send there to complete your booking request.\n\nYour slot is only confirmed after deposit is sent.\n\nYou\'ll hear from Yili soon! ✨',
+            whatsappLink: yiliLink
         });
 
-        // Generate WhatsApp notification links asynchronously
-        setImmediate(async () => {
-            try {
-                // Notification to owner (Yili)
-                const yiliMsg = generateYiliBookingNotification(booking);
-                const yiliLink = getYiliWhatsAppLink(yiliMsg);
-                const yiliSendResult = await sendWhatsAppMessage(process.env.YILI_WHATSAPP, yiliMsg);
-
-                if (yiliSendResult.sent) {
-                    console.log('✅ Yili booking notification sent successfully');
-                } else {
-                    console.log('⚠️ Could not auto-send Yili message:', yiliSendResult.error);
-                    console.log('✅ Yili booking notification link:', yiliLink);
-                }
-
-                // Confirmation to customer
-                if (booking.phone) {
-                    const customerMsg = generateCustomerConfirmationMessage(booking);
-                    const customerLink = getCustomerWhatsAppLink(booking.phone, customerMsg);
-                    const customerSendResult = await sendWhatsAppMessage(booking.phone, customerMsg);
-
-                    if (customerSendResult.sent) {
-                        console.log('✅ Customer confirmation sent successfully');
-                    } else {
-                        console.log('⚠️ Could not auto-send customer message:', customerSendResult.error);
-                        console.log('✅ Customer confirmation link:', customerLink);
-                    }
-                } else {
-                    console.log('⚠️ No customer phone provided, skipping WhatsApp notification');
-                }
-            } catch (error) {
-                console.error('Failed to generate WhatsApp messages:', error.message);
-            }
-        });
+        console.log('✅ Booking WhatsApp link ready:', yiliLink);
     } catch (error) {
         console.error('Booking submission error:', error);
         res.status(500).json({ error: error.message });

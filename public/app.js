@@ -561,7 +561,15 @@ async function handleBookingSubmit(e) {
         }
         
         closeBookingModal();
-        openConfirmationModal();
+
+        if (responseData.whatsappLink) {
+            window.open(responseData.whatsappLink, '_blank');
+        }
+
+        openConfirmationModal(responseData.whatsappLink);
+
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Confirm Booking';
     } catch (error) {
         console.error('Booking error:', error);
         let errorMsg = 'Booking failed: ';
@@ -576,7 +584,14 @@ async function handleBookingSubmit(e) {
     }
 }
 
-function openConfirmationModal() {
+function openConfirmationModal(whatsappLink) {
+    const whatsappButton = document.getElementById('openWhatsAppButton');
+
+    if (whatsappButton && whatsappLink) {
+        whatsappButton.href = whatsappLink;
+        whatsappButton.classList.remove('hidden');
+    }
+
     document.getElementById('confirmationModal').classList.remove('hidden');
 }
 
@@ -599,6 +614,12 @@ function resetBookingFlow() {
         selectedTime: null
     };
     document.getElementById('bookingForm').reset();
+
+    const whatsappButton = document.getElementById('openWhatsAppButton');
+    if (whatsappButton) {
+        whatsappButton.href = '#';
+        whatsappButton.classList.add('hidden');
+    }
 }
 
 function scrollToSection(id) {
