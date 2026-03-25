@@ -1,6 +1,20 @@
 // WhatsApp Service - Send booking notifications via WhatsApp links
 // Uses wa.me links for free sending (no subscriptions needed)
 
+function normalizePhoneNumber(phone) {
+    if (!phone) return '';
+
+    const digitsOnly = String(phone).replace(/\D/g, '');
+    if (!digitsOnly) return '';
+
+    // Convert UK local format (07...) to international format (447...)
+    if (digitsOnly.startsWith('0')) {
+        return `44${digitsOnly.slice(1)}`;
+    }
+
+    return digitsOnly;
+}
+
 function generateYiliBookingNotification(booking) {
     // Message to send to Yili (owner) about new booking
     const message = `🎫 NEW BOOKING RECEIVED!\n\n👤 Name: ${booking.fullName}\n📱 Phone: ${booking.phone}\n📧 Email: ${booking.email}\n\n💇 Hairstyle: ${booking.hairstyle}\n📏 Length: ${booking.length}\n💷 Price: £${booking.totalPrice}.00\n💳 Deposit: £10.00\n\n📅 Date: ${booking.preferredDate}\n🕐 Time: ${booking.preferredTime}\n\n📝 Notes: ${booking.notes || 'None'}\n\n⏳ Status: Awaiting £10 deposit payment`;
@@ -42,14 +56,64 @@ function generatePaymentConfirmationMessage(booking) {
 
 // Generate WhatsApp link URLs
 function getYiliWhatsAppLink(message) {
-    const yiliNumber = process.env.YILI_WHATSAPP || '447500039928';
+    const yiliNumber = normalizePhoneNumber(process.env.YILI_WHATSAPP || '447500039928');
     const encodedMessage = encodeURIComponent(message);
     return `https://wa.me/${yiliNumber}?text=${encodedMessage}`;
 }
 
 function getCustomerWhatsAppLink(customerPhone, message) {
+    const normalizedPhone = normalizePhoneNumber(customerPhone);
     const encodedMessage = encodeURIComponent(message);
-    return `https://wa.me/${customerPhone}?text=${encodedMessage}`;
+    return `https://wa.me/${normalizedPhone}?text=${encodedMessage}`;
+}
+
+async function sendWhatsAppMessage(phone, message) {
+    const recipient = normalizePhoneNumber(phone);
+    const token = process.env.WHATSAPP_API_TOKEN;
+    const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+
+    if (!recipient) {
+        return { sent: false, error: 'Invalid recipient phone number' };
+    }
+
+    if (!token || !phoneNumberId) {
+        return {
+            sent: false,
+            error: 'WhatsApp Cloud API not configured'
+        };
+    }
+
+    try {
+        const response = await fetch(`https://graph.facebook.com/v20.0/${phoneNumberId}/messages`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                messaging_product: 'whatsapp',
+                to: recipient,
+                type: 'text',
+                text: {
+                    body: message
+                }
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            return {
+                sent: false,
+                error: data?.error?.message || 'WhatsApp API request failed',
+                data
+            };
+        }
+
+        return { sent: true, data };
+    } catch (error) {
+        return { sent: false, error: error.message };
+    }
 }
 
 module.exports = {
@@ -58,6 +122,8 @@ module.exports = {
     generateCancellationMessage,
     generateRescheduleMessage,
     generatePaymentConfirmationMessage,
+    normalizePhoneNumber,
     getYiliWhatsAppLink,
-    getCustomerWhatsAppLink
+    getCustomerWhatsAppLink,
+    sendWhatsAppMessage
 };

@@ -11,7 +11,8 @@ const {
     generateCancellationMessage,
     generateRescheduleMessage,
     getYiliWhatsAppLink,
-    getCustomerWhatsAppLink
+    getCustomerWhatsAppLink,
+    sendWhatsAppMessage
 } = require('./whatsappService');
 
 const app = express();
@@ -134,18 +135,32 @@ app.post('/submit-booking', async (req, res) => {
         });
 
         // Generate WhatsApp notification links asynchronously
-        setImmediate(() => {
+        setImmediate(async () => {
             try {
                 // Notification to owner (Yili)
                 const yiliMsg = generateYiliBookingNotification(booking);
                 const yiliLink = getYiliWhatsAppLink(yiliMsg);
-                console.log('✅ Yili booking notification ready:', yiliLink);
+                const yiliSendResult = await sendWhatsAppMessage(process.env.YILI_WHATSAPP, yiliMsg);
+
+                if (yiliSendResult.sent) {
+                    console.log('✅ Yili booking notification sent successfully');
+                } else {
+                    console.log('⚠️ Could not auto-send Yili message:', yiliSendResult.error);
+                    console.log('✅ Yili booking notification link:', yiliLink);
+                }
 
                 // Confirmation to customer
                 if (booking.phone) {
                     const customerMsg = generateCustomerConfirmationMessage(booking);
                     const customerLink = getCustomerWhatsAppLink(booking.phone, customerMsg);
-                    console.log('✅ Customer confirmation ready:', customerLink);
+                    const customerSendResult = await sendWhatsAppMessage(booking.phone, customerMsg);
+
+                    if (customerSendResult.sent) {
+                        console.log('✅ Customer confirmation sent successfully');
+                    } else {
+                        console.log('⚠️ Could not auto-send customer message:', customerSendResult.error);
+                        console.log('✅ Customer confirmation link:', customerLink);
+                    }
                 } else {
                     console.log('⚠️ No customer phone provided, skipping WhatsApp notification');
                 }
@@ -885,7 +900,7 @@ app.get('/cancel-booking', (req, res) => {
 });
 
 // Cancel booking API endpoint
-app.post('/api/cancel-booking', (req, res) => {
+app.post('/api/cancel-booking', async (req, res) => {
     try {
         const { id, token, cancellationReason, awaitingPayment } = req.body;
         
@@ -932,7 +947,14 @@ app.post('/api/cancel-booking', (req, res) => {
             const cancellationMsg = generateCancellationMessage(booking, hoursUntilAppointment, awaitingPayment);
             if (booking.phone) {
                 const customerLink = getCustomerWhatsAppLink(booking.phone, cancellationMsg);
-                console.log('✅ Cancellation message ready:', customerLink);
+                const cancellationSendResult = await sendWhatsAppMessage(booking.phone, cancellationMsg);
+
+                if (cancellationSendResult.sent) {
+                    console.log('✅ Cancellation message sent successfully');
+                } else {
+                    console.log('⚠️ Could not auto-send cancellation message:', cancellationSendResult.error);
+                    console.log('✅ Cancellation message link:', customerLink);
+                }
             }
         } catch (error) {
             console.error('Failed to generate cancellation message:', error.message);
@@ -1061,7 +1083,7 @@ app.delete('/api/blocked-dates/:date', (req, res) => {
 });
 
 // Reschedule booking API endpoint
-app.post('/api/reschedule-booking', (req, res) => {
+app.post('/api/reschedule-booking', async (req, res) => {
     try {
         const { id, token, newDate, newTime } = req.body;
         
@@ -1115,7 +1137,14 @@ app.post('/api/reschedule-booking', (req, res) => {
             const rescheduleMsg = generateRescheduleMessage(oldBooking, booking);
             if (booking.phone) {
                 const rescheduleLink = getCustomerWhatsAppLink(booking.phone, rescheduleMsg);
-                console.log('✅ Reschedule message ready:', rescheduleLink);
+                const rescheduleSendResult = await sendWhatsAppMessage(booking.phone, rescheduleMsg);
+
+                if (rescheduleSendResult.sent) {
+                    console.log('✅ Reschedule message sent successfully');
+                } else {
+                    console.log('⚠️ Could not auto-send reschedule message:', rescheduleSendResult.error);
+                    console.log('✅ Reschedule message link:', rescheduleLink);
+                }
             }
         } catch (error) {
             console.error('Failed to generate reschedule message:', error.message);
