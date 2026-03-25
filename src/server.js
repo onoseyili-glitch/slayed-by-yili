@@ -6,13 +6,13 @@ const path = require('path');
 const crypto = require('crypto');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { 
-    sendConfirmationEmail, 
-    sendCustomerConfirmationEmail,
-    sendCancellationConfirmationEmail,
-    sendCancellationNotificationToStylist,
-    sendRescheduleConfirmationEmail,
-    sendRescheduleNotificationToStylist
-} = require('./emailService');
+    generateYiliBookingNotification,
+    generateCustomerConfirmationMessage,
+    generateCancellationMessage,
+    generateRescheduleMessage,
+    getYiliWhatsAppLink,
+    getCustomerWhatsAppLink
+} = require('./whatsappService');
 
 const app = express();
 
@@ -76,7 +76,7 @@ app.post('/create-payment-intent', async (req, res) => {
 // Submit Booking
 app.post('/submit-booking', async (req, res) => {
     try {
-        console.log('📧 EMAIL ROUTE HIT');
+        console.log('📱 BOOKING ROUTE HIT (WhatsApp notifications)');
         const {
             fullName,
             phone,
@@ -130,28 +130,27 @@ app.post('/submit-booking', async (req, res) => {
         res.json({
             success: true,
             bookingId: booking.id,
-            message: 'Booking confirmed successfully'
+            message: 'Booking Confirmed!\n\nThank you for booking with Slayed by Yili.\n\nYou\'ll receive a WhatsApp message shortly with your booking details and bank transfer instructions.\n\nYour slot is only confirmed after deposit is sent.\n\nYou\'ll hear from Yili soon! ✨'
         });
 
-        // Send emails asynchronously without blocking
-        setImmediate(async () => {
-            console.log('Starting email send for booking:', booking.id);
+        // Generate WhatsApp notification links asynchronously
+        setImmediate(() => {
             try {
-                await sendConfirmationEmail(booking);
-                console.log('Owner confirmation email sent successfully');
-            } catch (emailError) {
-                console.error('Failed to send confirmation email:', emailError.message);
-            }
+                // Notification to owner (Yili)
+                const yiliMsg = generateYiliBookingNotification(booking);
+                const yiliLink = getYiliWhatsAppLink(yiliMsg);
+                console.log('✅ Yili booking notification ready:', yiliLink);
 
-            if (email) {
-                try {
-                    await sendCustomerConfirmationEmail(booking);
-                    console.log('Customer confirmation email sent successfully');
-                } catch (emailError) {
-                    console.error('Failed to send customer email:', emailError.message);
+                // Confirmation to customer
+                if (booking.phone) {
+                    const customerMsg = generateCustomerConfirmationMessage(booking);
+                    const customerLink = getCustomerWhatsAppLink(booking.phone, customerMsg);
+                    console.log('✅ Customer confirmation ready:', customerLink);
+                } else {
+                    console.log('⚠️ No customer phone provided, skipping WhatsApp notification');
                 }
-            } else {
-                console.log('No customer email provided, skipping customer notification');
+            } catch (error) {
+                console.error('Failed to generate WhatsApp messages:', error.message);
             }
         });
     } catch (error) {
@@ -927,11 +926,17 @@ app.post('/api/cancel-booking', (req, res) => {
             blockedDates.splice(dateIndex, 1);
         }
         
-        // Send cancellation confirmation email
-        sendCancellationConfirmationEmail(booking, hoursUntilAppointment, awaitingPayment);
-        
-        // Send notification to stylist
-        sendCancellationNotificationToStylist(booking, hoursUntilAppointment, awaitingPayment);
+        // Send cancellation WhatsApp notifications
+        try {
+            // Customer cancellation message
+            const cancellationMsg = generateCancellationMessage(booking, hoursUntilAppointment, awaitingPayment);
+            if (booking.phone) {
+                const customerLink = getCustomerWhatsAppLink(booking.phone, cancellationMsg);
+                console.log('✅ Cancellation message ready:', customerLink);
+            }
+        } catch (error) {
+            console.error('Failed to generate cancellation message:', error.message);
+        }
         
         const message = awaitingPayment 
             ? 'Cancellation request submitted. You will need to complete the £5 payment before cancellation is confirmed.' 
@@ -1104,11 +1109,17 @@ app.post('/api/reschedule-booking', (req, res) => {
             }
         }
         
-        // Send reschedule confirmation email
-        sendRescheduleConfirmationEmail(booking, oldDate, oldTime);
-        
-        // Send reschedule notification to stylist
-        sendRescheduleNotificationToStylist(booking, oldDate, oldTime);
+        // Send reschedule WhatsApp notification
+        try {
+            const oldBooking = { ...booking, preferredDate: oldDate, preferredTime: oldTime };
+            const rescheduleMsg = generateRescheduleMessage(oldBooking, booking);
+            if (booking.phone) {
+                const rescheduleLink = getCustomerWhatsAppLink(booking.phone, rescheduleMsg);
+                console.log('✅ Reschedule message ready:', rescheduleLink);
+            }
+        } catch (error) {
+            console.error('Failed to generate reschedule message:', error.message);
+        }
         
         res.json({
             success: true,
