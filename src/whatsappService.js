@@ -17,7 +17,7 @@ function normalizePhoneNumber(phone) {
 
 function generateYiliBookingNotification(booking) {
     // Message to send to Yili (owner) about new booking
-    const message = `🎫 NEW BOOKING RECEIVED!\n\n👤 Name: ${booking.fullName}\n📱 Phone: ${booking.phone}\n📧 Email: ${booking.email}\n\n💇 Hairstyle: ${booking.hairstyle}\n📏 Length: ${booking.length}\n💷 Price: £${booking.totalPrice}.00\n💳 Deposit: £10.00\n\n📅 Date: ${booking.preferredDate}\n🕐 Time: ${booking.preferredTime}\n\n📝 Notes: ${booking.notes || 'None'}\n\n⏳ Status: Awaiting £10 deposit payment`;
+    const message = `Hi lovely 💕 thank you for booking with Slayed by Yili.\n\nYour appointment details:\n\nStyle: ${booking.hairstyle}\nLength: ${booking.length}\nDate: ${booking.preferredDate}\nTime: ${booking.preferredTime}\n\n📍 Location: No 2 Aln Street, Hebburn NE31 1XS\n💰 Deposit required to secure slot: £10\n\nBank details:\nName: Onoseyili Peculiar Lugard-Sadoh\nSort code: 233272\nAccount number: 11282972\n\nCustomer details:\nName: ${booking.fullName}\nPhone: ${booking.phone}\nEmail: ${booking.email}\n\nNotes: ${booking.notes || 'None'}\n\nYour slot is only confirmed after deposit is sent.\n\nThank you 💕`;
     return message;
 }
 
