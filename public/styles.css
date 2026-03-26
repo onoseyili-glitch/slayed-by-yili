@@ -112,6 +112,16 @@ section {
     font-weight: 300;
 }
 
+.hero-standard {
+    font-size: 0.9rem;
+    letter-spacing: 2.2px;
+    text-transform: uppercase;
+    color: #d4af37;
+    font-weight: 600;
+    margin-top: -1rem;
+    margin-bottom: 0.5rem;
+}
+
 .hero-content h1 {
     font-size: 3.5rem;
     margin-bottom: 1rem;
@@ -848,6 +858,11 @@ section h2 {
         font-size: 1.1rem;
     }
 
+    .hero-standard {
+        font-size: 0.8rem;
+        letter-spacing: 1.6px;
+    }
+
     .hero-logo {
         max-width: 350px;
     }
@@ -954,6 +969,11 @@ section h2 {
         font-size: 0.95rem;
     }
 
+    .hero-standard {
+        font-size: 0.72rem;
+        letter-spacing: 1.3px;
+    }
+
     .logo {
         font-size: 1.1rem;
     }
@@ -1058,6 +1078,11 @@ section h2 {
 
     .tagline {
         font-size: 0.85rem;
+    }
+
+    .hero-standard {
+        font-size: 0.66rem;
+        letter-spacing: 1.1px;
     }
 
     section h2 {
