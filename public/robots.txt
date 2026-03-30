@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /private
 
-Sitemap: https://slayedbyyili.com/sitemap.xml
+Sitemap: https://slayed-by-yili.onrender.com/sitemap.xml
