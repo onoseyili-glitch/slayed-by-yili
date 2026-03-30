@@ -99,8 +99,18 @@ const availabilityConfig = {
 const DISCOUNT_CODES = {
     YILI10: {
         type: 'percent',
-        value: 10,
-        label: '10% off'
+        value: 15,
+        label: '15% off'
+    },
+    BDAY10: {
+        type: 'percent',
+        value: 30,
+        label: '30% off'
+    },
+    FRIEND15: {
+        type: 'percent',
+        value: 25,
+        label: '25% off'
     }
 };
 
@@ -321,7 +331,7 @@ function openPricingModal() {
     const addonsTotal = document.getElementById('addonsTotal');
 
     discountInput.value = '';
-    discountMessage.textContent = 'Use code YILI10 for 10% off.';
+    discountMessage.textContent = 'Try codes: YILI10 (15%), BDAY10 (30%), FRIEND15 (25%).';
     discountLine.style.display = 'none';
     addonsTotal.style.display = 'none';
     
