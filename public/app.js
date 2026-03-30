@@ -132,6 +132,17 @@ let currentState = {
 // Initialize Stripe
 let stripe, cardElement;
 
+function getLocalDateString(date = new Date()) {
+    const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+    return localDate.toISOString().split('T')[0];
+}
+
+function getTomorrowLocalDateString() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return getLocalDateString(tomorrow);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     renderServiceCategories();
     setupEventListeners();
@@ -487,9 +498,7 @@ function openTimeSlotModal() {
     modal.classList.remove('hidden');
     
     // Set minimum date to today
-    const today = new Date();
-    today.setDate(today.getDate());
-    const minDate = today.toISOString().split('T')[0];
+    const minDate = getLocalDateString();
     
     const dateInput = document.getElementById('appointmentDate');
     dateInput.min = minDate;
@@ -606,8 +615,11 @@ function selectTimeSlot(time) {
 
 function openBookingModal() {
     // Pre-fill with selected date and time from time slot
+    const preferredDateInput = document.getElementById('preferredDate');
+    preferredDateInput.min = getLocalDateString();
+
     if (currentState.selectedDate && currentState.selectedTime) {
-        document.getElementById('preferredDate').value = currentState.selectedDate;
+        preferredDateInput.value = currentState.selectedDate;
         document.getElementById('preferredTime').value = currentState.selectedTime;
     }
     document.getElementById('bookingModal').classList.remove('hidden');
@@ -631,6 +643,15 @@ async function handleBookingSubmit(e) {
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Processing...';
+
+    const selectedDate = document.getElementById('preferredDate').value;
+    const todayLocal = getLocalDateString();
+    if (selectedDate < todayLocal) {
+        alert('You cannot book a past date. Please select today or a future date.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Confirm Booking';
+        return;
+    }
     
     const bookingData = {
         fullName: document.getElementById('fullName').value,
@@ -810,7 +831,7 @@ function showRescheduleModal(hairstyle, length, price, oldDate) {
     // Calculate min date (tomorrow) and max date (90 days from now)
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    const minDate = tomorrow.toISOString().split('T')[0];
+    const minDate = getTomorrowLocalDateString();
     
     const maxDate = new Date();
     maxDate.setDate(maxDate.getDate() + 90);

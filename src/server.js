@@ -138,6 +138,15 @@ app.post('/submit-booking', async (req, res) => {
             return res.status(400).json({ error: 'Missing required fields' });
         }
 
+        const today = new Date();
+        const localToday = new Date(today.getTime() - (today.getTimezoneOffset() * 60000))
+            .toISOString()
+            .split('T')[0];
+
+        if (preferredDate < localToday) {
+            return res.status(400).json({ error: 'Past dates are not allowed' });
+        }
+
         // Create booking object
         const booking = {
             id: Date.now(),
