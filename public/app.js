@@ -109,8 +109,8 @@ const DISCOUNT_CODES = {
     },
     FRIEND15: {
         type: 'percent',
-        value: 25,
-        label: '25% off'
+        value: 15,
+        label: '15% off'
     }
 };
 
