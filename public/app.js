@@ -525,6 +525,14 @@ function generateTimeSlots() {
     const dateInput = document.getElementById('appointmentDate').value;
     if (!dateInput) return;
     
+    const todayLocal = getLocalDateString();
+    if (dateInput < todayLocal) {
+        document.getElementById('bookingMessage').textContent = '❌ You cannot select a past date.';
+        document.getElementById('timeSlotsContainer').innerHTML = '';
+        document.getElementById('appointmentDate').value = '';
+        return;
+    }
+    
     const selectedDate = new Date(dateInput);
     const dayName = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
     
@@ -621,12 +629,23 @@ function selectTimeSlot(time) {
 function openBookingModal() {
     // Pre-fill with selected date and time from time slot
     const preferredDateInput = document.getElementById('preferredDate');
-    preferredDateInput.min = getLocalDateString();
+    const todayLocal = getLocalDateString();
+    preferredDateInput.min = todayLocal;
+    preferredDateInput.setAttribute('required', 'true');
 
     if (currentState.selectedDate && currentState.selectedTime) {
         preferredDateInput.value = currentState.selectedDate;
         document.getElementById('preferredTime').value = currentState.selectedTime;
     }
+    
+    // Prevent manual date entry of past dates
+    preferredDateInput.addEventListener('change', () => {
+        if (preferredDateInput.value && preferredDateInput.value < todayLocal) {
+            preferredDateInput.value = '';
+            alert('You cannot select a past date.');
+        }
+    });
+    
     document.getElementById('bookingModal').classList.remove('hidden');
 }
 
