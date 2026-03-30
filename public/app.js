@@ -69,6 +69,13 @@ const services = {
             { name: 'Kids Cornrows', pricing: { short: 20, medium: 25, long: 30 } },
             { name: 'Kids Natural Styles', pricing: { fixed: 15 } }
         ]
+    },
+    preparting: {
+        name: 'Pre Parting',
+        description: 'Professional pre-parting preparation',
+        hairstyles: [
+            { name: 'Pre Parting', pricing: { fixed: 20 } }
+        ]
     }
 };
 
