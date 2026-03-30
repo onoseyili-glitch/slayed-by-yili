@@ -16,8 +16,17 @@ function normalizePhoneNumber(phone) {
 }
 
 function generateYiliBookingNotification(booking) {
+    const basePrice = Number(booking.price || 0);
+    const addonsTotal = Number(booking.addonTotal || 0);
+    const discountAmount = Number(booking.discountAmount || 0);
+    const finalTotal = Number(booking.totalPrice || (basePrice + addonsTotal - discountAmount));
+    const appliedCode = booking.discountCode || 'None';
+    const addonsList = Array.isArray(booking.addons) && booking.addons.length
+        ? booking.addons.map(a => `${a.name} (£${a.price})`).join(', ')
+        : 'None';
+
     // Message to send to Yili (owner) about new booking
-    const message = `Hi lovely 💕 thank you for booking with Slayed by Yili.\n\nYour appointment details:\n\nStyle: ${booking.hairstyle}\nLength: ${booking.length}\nDate: ${booking.preferredDate}\nTime: ${booking.preferredTime}\n\n📍 Location: No 2 Aln Street, Hebburn NE31 1XS\n💰 Deposit required to secure slot: £10\n\nBank details:\nName: Onoseyili Peculiar Lugard-Sadoh\nSort code: 233272\nAccount number: 11282972\n\nCustomer details:\nName: ${booking.fullName}\nPhone: ${booking.phone}\nEmail: ${booking.email}\n\nNotes: ${booking.notes || 'None'}\n\nYour slot is only confirmed after deposit is sent.\n\nThank you 💕`;
+    const message = `Hi lovely 💕 thank you for booking with Slayed by Yili.\n\nYour appointment details:\n\nStyle: ${booking.hairstyle}\nLength: ${booking.length}\nDate: ${booking.preferredDate}\nTime: ${booking.preferredTime}\n\n💷 Price breakdown:\nBase price: £${basePrice}\nAdd-ons: ${addonsList}\nAdd-ons total: £${addonsTotal}\nDiscount code: ${appliedCode}\nDiscount amount: £${discountAmount}\nFinal total: £${finalTotal}\n\n📍 Location: No 2 Aln Street, Hebburn NE31 1XS\n💰 Deposit required to secure slot: £10\n\nBank details:\nName: Onoseyili Peculiar Lugard-Sadoh\nSort code: 233272\nAccount number: 11282972\n\nCustomer details:\nName: ${booking.fullName}\nPhone: ${booking.phone}\nEmail: ${booking.email}\n\nNotes: ${booking.notes || 'None'}\n\nYour slot is only confirmed after deposit is sent.\n\nThank you 💕`;
     return message;
 }
 
