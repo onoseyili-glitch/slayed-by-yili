@@ -99,8 +99,8 @@ const availabilityConfig = {
 const DISCOUNT_CODES = {
     YILI10: {
         type: 'percent',
-        value: 15,
-        label: '15% off'
+        value: 10,
+        label: '10% off'
     },
     BDAY10: {
         type: 'percent',
@@ -111,6 +111,11 @@ const DISCOUNT_CODES = {
         type: 'percent',
         value: 15,
         label: '15% off'
+    },
+    LOYAL15: {
+        type: 'fixed',
+        value: 15,
+        label: '£15 off'
     }
 };
 
