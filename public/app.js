@@ -331,7 +331,7 @@ function openPricingModal() {
     const addonsTotal = document.getElementById('addonsTotal');
 
     discountInput.value = '';
-    discountMessage.textContent = 'Try codes: YILI10 (15%), BDAY10 (30%), FRIEND15 (25%).';
+    discountMessage.textContent = 'Have a promo code? Enter it below and tap Apply.';
     discountLine.style.display = 'none';
     addonsTotal.style.display = 'none';
     
