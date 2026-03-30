@@ -111,11 +111,6 @@ const DISCOUNT_CODES = {
         type: 'percent',
         value: 15,
         label: '15% off'
-    },
-    LOYAL15: {
-        type: 'fixed',
-        value: 15,
-        label: '£15 off'
     }
 };
 
