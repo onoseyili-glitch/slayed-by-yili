@@ -15,8 +15,8 @@ const services = {
         name: 'Twists',
         description: 'Stylish twist variations',
         hairstyles: [
-            { name: 'Passion', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
-            { name: 'Spring', pricing: { short: 50, medium: 60, long: 70, extra: 80 } },
+            { name: 'Passion', pricing: { short: 35, medium: 45, long: 55, extra: 70 } },
+            { name: 'Spring', pricing: { short: 35, medium: 45, long: 55, extra: 70 } },
             { name: 'Mini', pricing: { short: 50, medium: 60, long: 70, extra: 80 } },
             { name: 'Rope', pricing: { fixed: 40 } },
             { name: 'Island Twists', pricing: { short: 45, medium: 55, long: 65, extra: 75 } },
@@ -194,8 +194,13 @@ function setupEventListeners() {
             // Close any open modals
             const modals = document.querySelectorAll('.modal');
             modals.forEach(modal => modal.classList.add('hidden'));
+            unlockBodyScroll();
         });
     });
+}
+
+function unlockBodyScroll() {
+    document.body.style.overflow = '';
 }
 
 function renderServiceCategories() {
@@ -239,6 +244,7 @@ function openServiceModal(categoryKey, categoryData) {
 
 function closeServiceModal() {
     document.getElementById('serviceModal').classList.add('hidden');
+    unlockBodyScroll();
 }
 
 function selectHairstyle(hairstyleName, pricing) {
@@ -293,6 +299,7 @@ function openLengthModal() {
 
 function closeLengthModal() {
     document.getElementById('lengthModal').classList.add('hidden');
+    unlockBodyScroll();
 }
 
 function selectLength(length) {
@@ -460,6 +467,7 @@ function updateAddonPrice() {
 
 function closePricingModal() {
     document.getElementById('pricingModal').classList.add('hidden');
+    unlockBodyScroll();
 }
 
 function proceedToPayment() {
@@ -496,6 +504,7 @@ function openTimeSlotModal() {
 
 function closeTimeSlotModal() {
     document.getElementById('timeSlotModal').classList.add('hidden');
+    unlockBodyScroll();
 }
 
 function generateTimeSlots() {
@@ -606,6 +615,7 @@ function openBookingModal() {
 
 function closeBookingModal() {
     document.getElementById('bookingModal').classList.add('hidden');
+    unlockBodyScroll();
 }
 
 async function handleBookingSubmit(e) {
@@ -710,6 +720,7 @@ function openConfirmationModal(whatsappLink) {
 
 function returnHome() {
     document.getElementById('confirmationModal').classList.add('hidden');
+    unlockBodyScroll();
     resetBookingFlow();
     window.scrollTo(0, 0);
 }
