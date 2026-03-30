@@ -95,6 +95,15 @@ const availabilityConfig = {
     blockedDates: []
 };
 
+// Built-in discount codes for customers
+const DISCOUNT_CODES = {
+    YILI10: {
+        type: 'percent',
+        value: 10,
+        label: '10% off'
+    }
+};
+
 // State Management
 let currentState = {
     selectedCategory: null,
@@ -103,6 +112,8 @@ let currentState = {
     price: null,
     addons: [],
     addonTotal: 0,
+    discountCode: null,
+    discountAmount: 0,
     paymentIntentId: null,
     selectedDate: null,
     selectedTime: null
@@ -297,11 +308,22 @@ function openPricingModal() {
     document.getElementById('summaryHairstyle').textContent = currentState.selectedHairstyle;
     document.getElementById('summaryLength').textContent = currentState.selectedLength;
     document.getElementById('summaryPrice').textContent = currentState.price;
-    document.getElementById('totalPrice').textContent = currentState.price;
     
     // Reset add-ons
     currentState.addons = [];
     currentState.addonTotal = 0;
+    currentState.discountCode = null;
+    currentState.discountAmount = 0;
+
+    const discountInput = document.getElementById('discountCodeInput');
+    const discountMessage = document.getElementById('discountMessage');
+    const discountLine = document.getElementById('discountLine');
+    const addonsTotal = document.getElementById('addonsTotal');
+
+    discountInput.value = '';
+    discountMessage.textContent = 'Use code YILI10 for 10% off.';
+    discountLine.style.display = 'none';
+    addonsTotal.style.display = 'none';
     
     // Show/hide deposit info based on category
     const depositLine = document.getElementById('depositLine');
@@ -323,9 +345,82 @@ function openPricingModal() {
         checkbox.checked = false;
         checkbox.addEventListener('change', updateAddonPrice);
     });
+
+    updateTotalPriceDisplay();
     
     const modal = document.getElementById('pricingModal');
     modal.classList.remove('hidden');
+}
+
+function getSubtotalPrice() {
+    return (Number(currentState.price) || 0) + (Number(currentState.addonTotal) || 0);
+}
+
+function getDiscountAmount(subtotal) {
+    if (!currentState.discountCode) return 0;
+    const rule = DISCOUNT_CODES[currentState.discountCode];
+    if (!rule) return 0;
+
+    let discount = 0;
+    if (rule.type === 'percent') {
+        discount = subtotal * (rule.value / 100);
+    } else if (rule.type === 'fixed') {
+        discount = rule.value;
+    }
+
+    return Math.min(subtotal, Number(discount.toFixed(2)));
+}
+
+function getFinalTotalPrice() {
+    const subtotal = getSubtotalPrice();
+    const discount = getDiscountAmount(subtotal);
+    return Number((subtotal - discount).toFixed(2));
+}
+
+function updateTotalPriceDisplay() {
+    const subtotal = getSubtotalPrice();
+    const discount = getDiscountAmount(subtotal);
+    const finalTotal = Number((subtotal - discount).toFixed(2));
+
+    currentState.discountAmount = discount;
+
+    document.getElementById('totalPrice').textContent = finalTotal;
+
+    const discountLine = document.getElementById('discountLine');
+    if (discount > 0) {
+        discountLine.style.display = 'block';
+        document.getElementById('discountAmount').textContent = discount;
+    } else {
+        discountLine.style.display = 'none';
+    }
+}
+
+function applyDiscountCode() {
+    const input = document.getElementById('discountCodeInput');
+    const discountMessage = document.getElementById('discountMessage');
+    const code = (input.value || '').trim().toUpperCase();
+
+    if (!code) {
+        currentState.discountCode = null;
+        currentState.discountAmount = 0;
+        discountMessage.textContent = 'Please enter a discount code.';
+        updateTotalPriceDisplay();
+        return;
+    }
+
+    if (!DISCOUNT_CODES[code]) {
+        currentState.discountCode = null;
+        currentState.discountAmount = 0;
+        discountMessage.textContent = 'Code not valid. Try again.';
+        updateTotalPriceDisplay();
+        return;
+    }
+
+    currentState.discountCode = code;
+    updateTotalPriceDisplay();
+
+    const rule = DISCOUNT_CODES[code];
+    discountMessage.textContent = `Code applied: ${code} (${rule.label})`;
 }
 
 function updateAddonPrice() {
@@ -341,8 +436,7 @@ function updateAddonPrice() {
     });
     
     // Update total price display
-    const totalPrice = currentState.price + currentState.addonTotal;
-    document.getElementById('totalPrice').textContent = totalPrice;
+    updateTotalPriceDisplay();
     
     // Show/hide add-ons total
     const addonsTotal = document.getElementById('addonsTotal');
@@ -530,7 +624,9 @@ async function handleBookingSubmit(e) {
         price: currentState.price,
         addons: currentState.addons,
         addonTotal: currentState.addonTotal,
-        totalPrice: currentState.price + currentState.addonTotal,
+        discountCode: currentState.discountCode,
+        discountAmount: currentState.discountAmount,
+        totalPrice: getFinalTotalPrice(),
         paymentIntentId: currentState.paymentIntentId
     };
     
@@ -616,6 +712,8 @@ function resetBookingFlow() {
         price: null,
         addons: [],
         addonTotal: 0,
+        discountCode: null,
+        discountAmount: 0,
         paymentIntentId: null,
         selectedDate: null,
         selectedTime: null

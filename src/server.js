@@ -127,6 +127,8 @@ app.post('/submit-booking', async (req, res) => {
             price,
             addons,
             addonTotal,
+            discountCode,
+            discountAmount,
             totalPrice,
             paymentIntentId
         } = req.body;
@@ -150,6 +152,8 @@ app.post('/submit-booking', async (req, res) => {
             price,
             addons: addons || [],
             addonTotal: addonTotal || 0,
+            discountCode: discountCode || null,
+            discountAmount: discountAmount || 0,
             totalPrice: totalPrice || price,
             depositPaid: hairstyle === 'Add-Ons' ? 0 : 10,
             paymentIntentId,

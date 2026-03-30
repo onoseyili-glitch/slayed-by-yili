@@ -151,6 +151,16 @@
                 </div>
                 <p id="addonsTotal" style="display: none; margin-top: 1rem;"><strong>Add-ons Total: £<span id="addonsTotalPrice">0</span></strong></p>
             </div>
+
+            <div class="discount-section">
+                <h3>Discount Code</h3>
+                <div class="discount-row">
+                    <input type="text" id="discountCodeInput" placeholder="Enter code (e.g. YILI10)">
+                    <button type="button" class="btn btn-secondary" onclick="applyDiscountCode()">Apply</button>
+                </div>
+                <p id="discountMessage" class="discount-message"></p>
+                <p id="discountLine" style="display: none; margin-top: 0.5rem;"><strong>Discount: -£<span id="discountAmount">0</span></strong></p>
+            </div>
             
             <p id="totalCost" style="margin-top: 1rem; font-size: 1.1rem;"><strong>Total: £<span id="totalPrice">0</span></strong></p>
             <button class="btn btn-primary" onclick="proceedToPayment()">Pay Deposit & Continue to Booking</button>

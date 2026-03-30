@@ -441,6 +441,44 @@ section h2 {
     gap: 0.75rem;
 }
 
+.discount-section {
+    background-color: rgba(244, 166, 193, 0.08);
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+    border-left: 4px solid var(--pink);
+}
+
+.discount-section h3 {
+    color: var(--pink);
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+.discount-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.discount-row input {
+    flex: 1;
+    padding: 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.discount-row .btn {
+    white-space: nowrap;
+    padding: 0.6rem 1rem;
+}
+
+.discount-message {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #666;
+}
+
 .addon-option {
     display: flex;
     align-items: center;
