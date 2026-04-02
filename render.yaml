@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: daisy-treats
+    env: static
+    rootDir: daisy-treats
+    buildCommand: ""
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
