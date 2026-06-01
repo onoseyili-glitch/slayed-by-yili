@@ -637,6 +637,84 @@ function generateTimeSlots() {
     container.appendChild(slotsGrid);
 }
 
+// --- Site search overlay functionality ---
+function openSiteSearch() {
+    document.getElementById('siteSearchOverlay').classList.remove('hidden');
+    document.getElementById('siteSearchInput').value = '';
+    document.getElementById('siteSearchResults').innerHTML = '';
+    document.getElementById('siteSearchInput').focus();
+    document.body.style.overflow = 'hidden';
+}
+
+function closeSiteSearch() {
+    document.getElementById('siteSearchOverlay').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+function performSiteSearch(query) {
+    const resultsContainer = document.getElementById('siteSearchResults');
+    resultsContainer.innerHTML = '';
+    if (!query || query.trim().length < 1) return;
+    const q = query.trim().toLowerCase();
+    // search within headings, paragraphs, links
+    const nodes = Array.from(document.querySelectorAll('h1,h2,h3,h4,p,a,li'));
+    const matches = [];
+    nodes.forEach(node => {
+        const text = (node.textContent || '').trim();
+        if (!text) return;
+        if (text.toLowerCase().includes(q)) {
+            matches.push({ node, text });
+        }
+    });
+
+    if (matches.length === 0) {
+        resultsContainer.innerHTML = '<p style="padding:12px;color:#666">No results found.</p>';
+        return;
+    }
+
+    matches.slice(0,50).forEach(match => {
+        const el = document.createElement('div');
+        el.className = 'search-result-item';
+        const title = document.createElement('h4');
+        // show first 60 chars as title
+        title.textContent = match.text.length > 60 ? match.text.slice(0,60) + '…' : match.text;
+        const snippet = document.createElement('p');
+        snippet.textContent = (match.node.parentElement && match.node.parentElement.id) ? `In section: #${match.node.parentElement.id}` : '';
+        el.appendChild(title);
+        el.appendChild(snippet);
+        el.addEventListener('click', () => {
+            // scroll to the node
+            match.node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            closeSiteSearch();
+        });
+        resultsContainer.appendChild(el);
+    });
+}
+
+// Wire search UI
+document.addEventListener('DOMContentLoaded', () => {
+    const searchBtn = document.getElementById('siteSearchButton');
+    const overlay = document.getElementById('siteSearchOverlay');
+    const closeBtn = overlay ? overlay.querySelector('.close-search') : null;
+    const input = document.getElementById('siteSearchInput');
+
+    if (searchBtn) searchBtn.addEventListener('click', openSiteSearch);
+    if (closeBtn) closeBtn.addEventListener('click', closeSiteSearch);
+    if (overlay) overlay.addEventListener('click', (e) => { if (e.target === overlay) closeSiteSearch(); });
+    if (input) {
+        input.addEventListener('input', (e) => performSiteSearch(e.target.value));
+        input.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSiteSearch(); });
+    }
+
+    // keyboard shortcut Ctrl+K or Cmd+K to open
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            openSiteSearch();
+        }
+    });
+});
+
 function selectTimeSlot(time) {
     const dateInput = document.getElementById('appointmentDate').value;
     currentState.selectedDate = dateInput;

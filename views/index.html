@@ -493,5 +493,15 @@
     </footer>
 
     <script src="/app.js"></script>
+    <!-- Floating site search button + overlay -->
+    <button id="siteSearchButton" aria-label="Search site">🔍</button>
+    <div id="siteSearchOverlay" class="hidden">
+        <div class="search-panel">
+            <button class="close-search" aria-label="Close search">×</button>
+            <h3>Search the site</h3>
+            <input id="siteSearchInput" type="search" placeholder="Search for services, policies, FAQs..." autofocus />
+            <div id="siteSearchResults" class="search-results"></div>
+        </div>
+    </div>
 </body>
 </html>
