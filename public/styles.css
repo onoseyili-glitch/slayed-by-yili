@@ -866,6 +866,38 @@ section h2 {
     margin-top: 2rem;
 }
 
+/* Extensions section */
+.extensions {
+    padding: 40px 0;
+    background: #fff;
+}
+.extensions .extensions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-top: 1rem;
+}
+.extension-item {
+    text-align: center;
+}
+.extension-item img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+.extension-item figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    color: #333;
+}
+.extensions-note {
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
+    color: #444;
+}
+
 .portfolio-item {
     background: #000;
     border-radius: 8px;
