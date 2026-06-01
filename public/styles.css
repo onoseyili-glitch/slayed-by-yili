@@ -1020,10 +1020,10 @@ section h2 {
 }
 
 /* Floating search button + overlay */
+#siteCheckoutButton,
 #siteSearchButton {
     position: fixed;
     right: 18px;
-    bottom: 18px;
     width: 56px;
     height: 56px;
     border-radius: 50%;
@@ -1034,6 +1034,14 @@ section h2 {
     font-size: 22px;
     cursor: pointer;
     z-index: 1200;
+}
+
+#siteCheckoutButton {
+    bottom: 88px;
+}
+
+#siteSearchButton {
+    bottom: 18px;
 }
 
 #siteSearchOverlay {

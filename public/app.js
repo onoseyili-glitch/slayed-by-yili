@@ -792,6 +792,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeBtn = overlay ? overlay.querySelector('.close-search') : null;
     const input = document.getElementById('siteSearchInput');
 
+    const checkoutBtn = document.getElementById('siteCheckoutButton');
+
+    if (checkoutBtn) checkoutBtn.addEventListener('click', openCheckoutWhatsApp);
     if (searchBtn) searchBtn.addEventListener('click', openSiteSearch);
     if (closeBtn) closeBtn.addEventListener('click', closeSiteSearch);
     if (overlay) overlay.addEventListener('click', (e) => { if (e.target === overlay) closeSiteSearch(); });
@@ -1003,7 +1006,7 @@ function scrollToServices() {
 }
 
 function openCheckoutWhatsApp() {
-    const message = `Hi lovely 💕\n\nI would like to checkout with Slayed by Yili. Please send me the booking details and bank details.\n\nBank details:\nName: Onoseyili Peculiar Lugard-Sadoh\nSort code: 233272\nAccount number: 11282972\n\nThank you for booking with Slayed by Yili!`;
+    const message = `Hi lovely 💕\n\nThank you for booking with Slayed by Yili. Your order details are below.\n\nPlease send me the booking confirmation and bank details so I can pay as soon as possible.\n\nBank details:\nName: Onoseyili Peculiar Lugard-Sadoh\nSort code: 233272\nAccount number: 11282972\n\nDelivery options:\n- Standard UK Delivery: £4.99\n- ✨ Express UK Delivery: £7.99\n- ✨ Free delivery on orders over £100\n\nPickup is also available.\n\nThank you for booking with Slayed by Yili!`;
     const checkoutUrl = `https://wa.me/447500039928?text=${encodeURIComponent(message)}`;
     window.open(checkoutUrl, '_blank');
 }
