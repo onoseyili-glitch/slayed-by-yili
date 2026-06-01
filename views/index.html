@@ -152,9 +152,15 @@
                     </label>
                     <div class="addon-option extension-with-colors">
                         <label style="display:flex; gap:8px; align-items:center;">
-                            <input type="checkbox" data-addon-name="Bone Straight Extensions" data-addon-price="5" class="addon-checkbox" id="addon-bone-extensions">
+                            <input type="checkbox" data-addon-name="Bone Straight Extensions" data-addon-price="5" data-addon-quantity="1" class="addon-checkbox" id="addon-bone-extensions">
                             <span>Bone Straight Extensions — £5 per pack</span>
                         </label>
+                        <div class="extension-quantity">
+                            <button type="button" class="qty-btn" data-action="decrease" data-target="#addon-bone-extensions">–</button>
+                            <input type="number" id="addon-bone-extensions-qty" class="addon-qty-input" min="1" value="1" data-related-checkbox="#addon-bone-extensions">
+                            <button type="button" class="qty-btn" data-action="increase" data-target="#addon-bone-extensions">+</button>
+                            <span class="qty-label">pack(s)</span>
+                        </div>
                         <div class="extension-color-picker" data-related-checkbox="#addon-bone-extensions">
                             <button type="button" class="color-option selected" data-addon-color="T33" title="T33">
                                 <img src="/images/extensions/1.svg" alt="T33"/>

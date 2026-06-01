@@ -371,9 +371,36 @@ function openPricingModal() {
     // Setup add-ons checkboxes
     document.querySelectorAll('.addon-checkbox').forEach(checkbox => {
         checkbox.checked = false;
-        // clear any previous color selection stored on the checkbox
+        // clear any previous color selection or quantity stored on the checkbox
         delete checkbox.dataset.addonColor;
-        checkbox.addEventListener('change', updateAddonPrice);
+        checkbox.dataset.addonQuantity = '1';
+
+        const quantityInput = document.querySelector(`.addon-qty-input[data-related-checkbox="#${checkbox.id}"]`);
+        if (quantityInput) {
+            quantityInput.value = '1';
+            quantityInput.disabled = true;
+            quantityInput.addEventListener('change', () => {
+                let quantity = parseInt(quantityInput.value, 10);
+                if (isNaN(quantity) || quantity < 1) quantity = 1;
+                quantityInput.value = quantity;
+                checkbox.dataset.addonQuantity = quantity.toString();
+                if (checkbox.checked) updateAddonPrice();
+            });
+        }
+
+        checkbox.addEventListener('change', () => {
+            if (quantityInput) {
+                if (checkbox.checked) {
+                    quantityInput.disabled = false;
+                    checkbox.dataset.addonQuantity = parseInt(quantityInput.value, 10) || 1;
+                } else {
+                    quantityInput.disabled = true;
+                    quantityInput.value = '1';
+                    checkbox.dataset.addonQuantity = '1';
+                }
+            }
+            updateAddonPrice();
+        });
     });
 
     // Setup extension color pickers (buttons under the Bone Straight Extensions addon)
@@ -393,6 +420,26 @@ function openPricingModal() {
                 // if the addon is already checked, update the addon list/prices to include color
                 if (relatedCheckbox && relatedCheckbox.checked) updateAddonPrice();
             });
+        });
+    });
+
+    document.querySelectorAll('.qty-btn').forEach(button => {
+        const quantityInput = document.querySelector(`.addon-qty-input[data-related-checkbox="${button.dataset.target}"]`);
+        if (!quantityInput) return;
+
+        button.addEventListener('click', () => {
+            let quantity = parseInt(quantityInput.value, 10) || 1;
+            if (button.dataset.action === 'decrease') {
+                quantity = Math.max(1, quantity - 1);
+            } else {
+                quantity += 1;
+            }
+            quantityInput.value = quantity;
+            const relatedCheckbox = document.querySelector(quantityInput.dataset.relatedCheckbox);
+            if (relatedCheckbox) {
+                relatedCheckbox.dataset.addonQuantity = quantity.toString();
+                if (relatedCheckbox.checked) updateAddonPrice();
+            }
         });
     });
 
@@ -479,13 +526,21 @@ function updateAddonPrice() {
 
     document.querySelectorAll('.addon-checkbox:checked').forEach(checkbox => {
         const color = checkbox.dataset.addonColor || '';
-        const addonName = color ? `${checkbox.dataset.addonName} (${color})` : checkbox.dataset.addonName;
+        const quantity = parseInt(checkbox.dataset.addonQuantity || '1', 10) || 1;
+        const unitPrice = parseInt(checkbox.dataset.addonPrice, 10) || 0;
+        const price = unitPrice * quantity;
+        let addonName = color ? `${checkbox.dataset.addonName} (${color})` : checkbox.dataset.addonName;
+        if (quantity > 1) {
+            addonName = `${addonName} x${quantity}`;
+        }
+
         currentState.addons.push({
             name: addonName,
-            price: parseInt(checkbox.dataset.addonPrice),
-            color: color
+            price: price,
+            color: color,
+            quantity: quantity
         });
-        currentState.addonTotal += parseInt(checkbox.dataset.addonPrice);
+        currentState.addonTotal += price;
     });
 
     // Update total price display
