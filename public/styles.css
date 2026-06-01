@@ -1009,7 +1009,7 @@ section h2 {
 .search-result-item { padding: 10px 8px; border-bottom: 1px solid #f1f1f1; cursor: pointer; }
 .search-result-item h4 { margin: 0; font-size: 15px; }
 .search-result-item p { margin: 6px 0 0 0; color: #555; font-size: 13px; }
-.hidden { display: none; }
+.hidden { display: none !important; }
 
 .portfolio-item {
     background: #000;
