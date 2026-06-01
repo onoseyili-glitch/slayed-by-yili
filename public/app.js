@@ -371,7 +371,29 @@ function openPricingModal() {
     // Setup add-ons checkboxes
     document.querySelectorAll('.addon-checkbox').forEach(checkbox => {
         checkbox.checked = false;
+        // clear any previous color selection stored on the checkbox
+        delete checkbox.dataset.addonColor;
         checkbox.addEventListener('change', updateAddonPrice);
+    });
+
+    // Setup extension color pickers (buttons under the Bone Straight Extensions addon)
+    document.querySelectorAll('.extension-color-picker').forEach(picker => {
+        const relatedSelector = picker.dataset.relatedCheckbox;
+        const relatedCheckbox = relatedSelector ? document.querySelector(relatedSelector) : null;
+        picker.querySelectorAll('.color-option').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // mark selected button
+                picker.querySelectorAll('.color-option').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+
+                const color = btn.dataset.addonColor;
+                if (relatedCheckbox) {
+                    relatedCheckbox.dataset.addonColor = color;
+                }
+                // if the addon is already checked, update the addon list/prices to include color
+                if (relatedCheckbox && relatedCheckbox.checked) updateAddonPrice();
+            });
+        });
     });
 
     updateTotalPriceDisplay();
@@ -454,18 +476,21 @@ function applyDiscountCode() {
 function updateAddonPrice() {
     currentState.addons = [];
     currentState.addonTotal = 0;
-    
+
     document.querySelectorAll('.addon-checkbox:checked').forEach(checkbox => {
+        const color = checkbox.dataset.addonColor || '';
+        const addonName = color ? `${checkbox.dataset.addonName} (${color})` : checkbox.dataset.addonName;
         currentState.addons.push({
-            name: checkbox.dataset.addonName,
-            price: parseInt(checkbox.dataset.addonPrice)
+            name: addonName,
+            price: parseInt(checkbox.dataset.addonPrice),
+            color: color
         });
         currentState.addonTotal += parseInt(checkbox.dataset.addonPrice);
     });
-    
+
     // Update total price display
     updateTotalPriceDisplay();
-    
+
     // Show/hide add-ons total
     const addonsTotal = document.getElementById('addonsTotal');
     if (currentState.addonTotal > 0) {

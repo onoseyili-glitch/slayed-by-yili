@@ -150,10 +150,29 @@
                         <input type="checkbox" data-addon-name="Extra Density" data-addon-price="10" class="addon-checkbox">
                         <span>Extra Density — £10</span>
                     </label>
-                    <label class="addon-option">
-                        <input type="checkbox" data-addon-name="Bone Straight Extensions" data-addon-price="5" class="addon-checkbox">
-                        <span>Bone Straight Extensions — £5 per pack</span>
-                    </label>
+                    <div class="addon-option extension-with-colors">
+                        <label style="display:flex; gap:8px; align-items:center;">
+                            <input type="checkbox" data-addon-name="Bone Straight Extensions" data-addon-price="5" class="addon-checkbox" id="addon-bone-extensions">
+                            <span>Bone Straight Extensions — £5 per pack</span>
+                        </label>
+                        <div class="extension-color-picker" data-related-checkbox="#addon-bone-extensions">
+                            <button type="button" class="color-option selected" data-addon-color="T33" title="T33">
+                                <img src="/images/extensions/1.svg" alt="T33"/>
+                            </button>
+                            <button type="button" class="color-option" data-addon-color="OT4/27" title="OT4/27">
+                                <img src="/images/extensions/2.svg" alt="OT4/27"/>
+                            </button>
+                            <button type="button" class="color-option" data-addon-color="#32" title="#32">
+                                <img src="/images/extensions/3.svg" alt="#32"/>
+                            </button>
+                            <button type="button" class="color-option" data-addon-color="Gold" title="Gold">
+                                <img src="/images/extensions/4.svg" alt="Gold"/>
+                            </button>
+                            <button type="button" class="color-option" data-addon-color="OT/350" title="OT/350">
+                                <img src="/images/extensions/5.svg" alt="OT/350"/>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <p id="addonsTotal" style="display: none; margin-top: 1rem;"><strong>Add-ons Total: £<span id="addonsTotalPrice">0</span></strong></p>
             </div>
