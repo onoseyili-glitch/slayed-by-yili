@@ -582,6 +582,25 @@ function updateAddonPrice() {
         currentState.addonTotal += selection.price;
     });
 
+    // Deduplicate/merge addons by color/name to avoid duplicate entries (e.g. from both addon checkbox and standalone selectors)
+    const merged = {};
+    currentState.addons.forEach(a => {
+        const key = (a.color && a.color.toString()) || a.name;
+        if (!merged[key]) {
+            merged[key] = Object.assign({}, a);
+        } else {
+            // merge quantities and prices
+            merged[key].quantity = (Number(merged[key].quantity) || 0) + (Number(a.quantity) || 0);
+            merged[key].price = (Number(merged[key].price) || 0) + (Number(a.price) || 0);
+            // update display name to reflect quantity
+            merged[key].name = `${merged[key].name.replace(/ x\d+$/, '')} x${merged[key].quantity}`;
+        }
+    });
+
+    currentState.addons = Object.values(merged);
+    // Recompute addonTotal to be safe
+    currentState.addonTotal = currentState.addons.reduce((s, a) => s + (Number(a.price) || 0), 0);
+
     // Update total price display
     updateTotalPriceDisplay();
 
