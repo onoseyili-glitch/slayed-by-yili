@@ -1024,16 +1024,21 @@ section h2 {
 #siteSearchButton {
     position: fixed;
     right: 18px;
-    width: 56px;
+    min-width: 56px;
     height: 56px;
-    border-radius: 50%;
+    border-radius: 56px;
     background: #d4af37;
     color: #fff;
     border: none;
     box-shadow: 0 6px 18px rgba(0,0,0,0.18);
-    font-size: 22px;
+    font-size: 18px;
     cursor: pointer;
     z-index: 1200;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 12px;
 }
 
 #siteCheckoutButton {
@@ -1042,6 +1047,10 @@ section h2 {
 
 #siteSearchButton {
     bottom: 18px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    padding: 0;
 }
 
 #siteSearchOverlay {
