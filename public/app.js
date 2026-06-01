@@ -1002,6 +1002,12 @@ function scrollToServices() {
     scrollToSection('services');
 }
 
+function openCheckoutWhatsApp() {
+    const message = `Hi lovely 💕\n\nI would like to checkout with Slayed by Yili. Please send me the booking details and bank details.\n\nBank details:\nName: Onoseyili Peculiar Lugard-Sadoh\nSort code: 233272\nAccount number: 11282972\n\nThank you for booking with Slayed by Yili!`;
+    const checkoutUrl = `https://wa.me/447500039928?text=${encodeURIComponent(message)}`;
+    window.open(checkoutUrl, '_blank');
+}
+
 // Reschedule booking flow
 function handleRescheduleFlow() {
     const bookingId = sessionStorage.getItem('rescheduleBookingId');

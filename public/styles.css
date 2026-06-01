@@ -815,6 +815,18 @@ section h2 {
     text-decoration: underline;
 }
 
+.contact-cta-row {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.contact-cta-row .btn {
+    min-width: 160px;
+}
+
 .social-links {
     display: flex;
     gap: 1.5rem;
