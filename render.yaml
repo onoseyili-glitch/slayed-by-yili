@@ -1,11 +1,9 @@
 services:
   - type: web
-    name: daisy-treats
-    env: static
-    rootDir: daisy-treats
-    buildCommand: ""
-    staticPublishPath: .
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    name: slayed-by-yili
+    env: node
+    plan: free
+    rootDir: .
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
