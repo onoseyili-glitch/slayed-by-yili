@@ -892,6 +892,51 @@ section h2 {
     font-size: 0.95rem;
     color: #333;
 }
+.extensions-order-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    margin-top: 1.5rem;
+}
+.extension-order-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+.extension-order-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid #eee;
+}
+.extension-order-details {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.extension-order-details h3 {
+    margin: 0;
+    font-size: 1.05rem;
+}
+.extension-order-details p {
+    margin: 0;
+    color: #555;
+    font-size: 0.95rem;
+}
+.extension-order-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+.ext-qty-input {
+    width: 70px;
+}
 .extensions-note {
     margin-top: 0.75rem;
     font-size: 0.95rem;

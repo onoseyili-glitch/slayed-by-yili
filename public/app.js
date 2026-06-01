@@ -198,6 +198,43 @@ function setupEventListeners() {
         bookingForm.addEventListener('submit', handleBookingSubmit);
     }
     
+    // Quantity button controls for both add-on inputs and standalone extension inputs
+    document.querySelectorAll('.qty-btn').forEach(button => {
+        const targetSelector = button.dataset.target;
+        if (!targetSelector) return;
+
+        const quantityInput = document.querySelector(targetSelector);
+        if (!quantityInput) return;
+
+        button.addEventListener('click', () => {
+            let quantity = parseInt(quantityInput.value, 10) || 0;
+            if (button.dataset.action === 'decrease') {
+                quantity = Math.max(0, quantity - 1);
+            } else {
+                quantity += 1;
+            }
+            quantityInput.value = quantity;
+            if (quantityInput.classList.contains('ext-qty-input')) {
+                updateAddonPrice();
+                return;
+            }
+            const relatedCheckbox = document.querySelector(quantityInput.dataset.relatedCheckbox);
+            if (relatedCheckbox) {
+                relatedCheckbox.dataset.addonQuantity = quantity.toString();
+                if (relatedCheckbox.checked) updateAddonPrice();
+            }
+        });
+    });
+
+    document.querySelectorAll('.ext-qty-input').forEach(input => {
+        input.addEventListener('change', () => {
+            let quantity = parseInt(input.value, 10);
+            if (isNaN(quantity) || quantity < 0) quantity = 0;
+            input.value = quantity;
+            updateAddonPrice();
+        });
+    });
+
     // Close modal when clicking policies link in checkbox
     const policyLinks = document.querySelectorAll('a[href="#policies"]');
     policyLinks.forEach(link => {
@@ -423,30 +460,26 @@ function openPricingModal() {
         });
     });
 
-    document.querySelectorAll('.qty-btn').forEach(button => {
-        const quantityInput = document.querySelector(`.addon-qty-input[data-related-checkbox="${button.dataset.target}"]`);
-        if (!quantityInput) return;
-
-        button.addEventListener('click', () => {
-            let quantity = parseInt(quantityInput.value, 10) || 1;
-            if (button.dataset.action === 'decrease') {
-                quantity = Math.max(1, quantity - 1);
-            } else {
-                quantity += 1;
-            }
-            quantityInput.value = quantity;
-            const relatedCheckbox = document.querySelector(quantityInput.dataset.relatedCheckbox);
-            if (relatedCheckbox) {
-                relatedCheckbox.dataset.addonQuantity = quantity.toString();
-                if (relatedCheckbox.checked) updateAddonPrice();
-            }
-        });
-    });
-
-    updateTotalPriceDisplay();
+    updateAddonPrice();
     
     const modal = document.getElementById('pricingModal');
     modal.classList.remove('hidden');
+}
+
+function collectStandaloneExtensionSelections() {
+    const selections = [];
+    document.querySelectorAll('.ext-qty-input').forEach(input => {
+        const quantity = parseInt(input.value, 10) || 0;
+        if (quantity <= 0) return;
+        const color = input.dataset.extensionColor || '';
+        selections.push({
+            name: `Bone Straight Extensions (${color}) x${quantity}`,
+            price: 5 * quantity,
+            color: color,
+            quantity: quantity
+        });
+    });
+    return selections;
 }
 
 function getSubtotalPrice() {
@@ -541,6 +574,12 @@ function updateAddonPrice() {
             quantity: quantity
         });
         currentState.addonTotal += price;
+    });
+
+    const extensionSelections = collectStandaloneExtensionSelections();
+    extensionSelections.forEach(selection => {
+        currentState.addons.push(selection);
+        currentState.addonTotal += selection.price;
     });
 
     // Update total price display

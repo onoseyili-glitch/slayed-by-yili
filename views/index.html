@@ -156,9 +156,9 @@
                             <span>Bone Straight Extensions — £5 per pack</span>
                         </label>
                         <div class="extension-quantity">
-                            <button type="button" class="qty-btn" data-action="decrease" data-target="#addon-bone-extensions">–</button>
+                            <button type="button" class="qty-btn" data-action="decrease" data-target="#addon-bone-extensions-qty">–</button>
                             <input type="number" id="addon-bone-extensions-qty" class="addon-qty-input" min="1" value="1" data-related-checkbox="#addon-bone-extensions">
-                            <button type="button" class="qty-btn" data-action="increase" data-target="#addon-bone-extensions">+</button>
+                            <button type="button" class="qty-btn" data-action="increase" data-target="#addon-bone-extensions-qty">+</button>
                             <span class="qty-label">pack(s)</span>
                         </div>
                         <div class="extension-color-picker" data-related-checkbox="#addon-bone-extensions">
@@ -361,35 +361,74 @@
         </div>
     </section>
 
-    <!-- Policies Section -->
     <!-- Bone Straight Extensions Section -->
     <section id="extensions" class="extensions">
         <div class="container">
             <h2>Bone Straight Extensions</h2>
-            <p class="section-subtitle">Strictly bone straight — 28" • 150g silky per pack</p>
-            <div class="extensions-grid">
-                <figure class="extension-item">
+            <p class="section-subtitle">Order bone straight extensions separately by colour and quantity.</p>
+            <div class="extensions-order-grid">
+                <div class="extension-order-card">
                     <img src="/images/extensions/1.svg" alt="T33 Bone Straight Extension">
-                    <figcaption>T33 — 28" • 150g silky</figcaption>
-                </figure>
-                <figure class="extension-item">
+                    <div class="extension-order-details">
+                        <h3>T33</h3>
+                        <p>28" • 150g silky • £5 per pack</p>
+                        <div class="extension-order-controls">
+                            <button type="button" class="qty-btn" data-action="decrease" data-target="#ext-t33-qty">–</button>
+                            <input type="number" id="ext-t33-qty" class="addon-qty-input ext-qty-input" min="0" value="0" data-extension-color="T33">
+                            <button type="button" class="qty-btn" data-action="increase" data-target="#ext-t33-qty">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="extension-order-card">
                     <img src="/images/extensions/2.svg" alt="OT4/27 Bone Straight Extension">
-                    <figcaption>OT4/27 — 28" • 150g silky</figcaption>
-                </figure>
-                <figure class="extension-item">
+                    <div class="extension-order-details">
+                        <h3>OT4/27</h3>
+                        <p>28" • 150g silky • £5 per pack</p>
+                        <div class="extension-order-controls">
+                            <button type="button" class="qty-btn" data-action="decrease" data-target="#ext-ot4-27-qty">–</button>
+                            <input type="number" id="ext-ot4-27-qty" class="addon-qty-input ext-qty-input" min="0" value="0" data-extension-color="OT4/27">
+                            <button type="button" class="qty-btn" data-action="increase" data-target="#ext-ot4-27-qty">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="extension-order-card">
                     <img src="/images/extensions/3.svg" alt="#32 Bone Straight Extension">
-                    <figcaption>#32 — 28" • 150g silky</figcaption>
-                </figure>
-                <figure class="extension-item">
-                    <img src="/images/extensions/4.svg" alt="#Gold Bone Straight Extension">
-                    <figcaption>Gold — 28" • 150g silky</figcaption>
-                </figure>
-                <figure class="extension-item">
+                    <div class="extension-order-details">
+                        <h3>#32</h3>
+                        <p>28" • 150g silky • £5 per pack</p>
+                        <div class="extension-order-controls">
+                            <button type="button" class="qty-btn" data-action="decrease" data-target="#ext-32-qty">–</button>
+                            <input type="number" id="ext-32-qty" class="addon-qty-input ext-qty-input" min="0" value="0" data-extension-color="#32">
+                            <button type="button" class="qty-btn" data-action="increase" data-target="#ext-32-qty">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="extension-order-card">
+                    <img src="/images/extensions/4.svg" alt="Gold Bone Straight Extension">
+                    <div class="extension-order-details">
+                        <h3>Gold</h3>
+                        <p>28" • 150g silky • £5 per pack</p>
+                        <div class="extension-order-controls">
+                            <button type="button" class="qty-btn" data-action="decrease" data-target="#ext-gold-qty">–</button>
+                            <input type="number" id="ext-gold-qty" class="addon-qty-input ext-qty-input" min="0" value="0" data-extension-color="Gold">
+                            <button type="button" class="qty-btn" data-action="increase" data-target="#ext-gold-qty">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="extension-order-card">
                     <img src="/images/extensions/5.svg" alt="OT/350 Bone Straight Extension">
-                    <figcaption>OT/350 — 28" • 150g silky</figcaption>
-                </figure>
+                    <div class="extension-order-details">
+                        <h3>OT/350</h3>
+                        <p>28" • 150g silky • £5 per pack</p>
+                        <div class="extension-order-controls">
+                            <button type="button" class="qty-btn" data-action="decrease" data-target="#ext-ot350-qty">–</button>
+                            <input type="number" id="ext-ot350-qty" class="addon-qty-input ext-qty-input" min="0" value="0" data-extension-color="OT/350">
+                            <button type="button" class="qty-btn" data-action="increase" data-target="#ext-ot350-qty">+</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <p class="extensions-note">Price: £5 per pack. Select quantity when booking or message to confirm required packs.</p>
+            <p class="extensions-note">Select different colours and quantities here. These will be included in your booking automatically, even if you also choose extension add-ons in the booking modal.</p>
         </div>
     </section>
 
