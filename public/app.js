@@ -794,7 +794,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const checkoutBtn = document.getElementById('siteCheckoutButton');
 
-    if (checkoutBtn) checkoutBtn.addEventListener('click', openCheckoutWhatsApp);
+    if (checkoutBtn) checkoutBtn.addEventListener('click', openCheckoutModal);
     if (searchBtn) searchBtn.addEventListener('click', openSiteSearch);
     if (closeBtn) closeBtn.addEventListener('click', closeSiteSearch);
     if (overlay) overlay.addEventListener('click', (e) => { if (e.target === overlay) closeSiteSearch(); });
@@ -1005,10 +1005,111 @@ function scrollToServices() {
     scrollToSection('services');
 }
 
-function openCheckoutWhatsApp() {
-    const message = `Hi lovely 💕\n\nThank you for booking with Slayed by Yili. Your order details are below.\n\nPlease send me the booking confirmation and bank details so I can pay as soon as possible.\n\nBank details:\nName: Onoseyili Peculiar Lugard-Sadoh\nSort code: 233272\nAccount number: 11282972\n\nDelivery options:\n- Standard UK Delivery: £4.99\n- ✨ Express UK Delivery: £7.99\n- ✨ Free delivery on orders over £100\n\nPickup is also available.\n\nThank you for booking with Slayed by Yili!`;
-    const checkoutUrl = `https://wa.me/447500039928?text=${encodeURIComponent(message)}`;
+function openCheckoutModal() {
+    populateCheckoutModal();
+    const modal = document.getElementById('checkoutModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeCheckoutModal() {
+    const modal = document.getElementById('checkoutModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        unlockBodyScroll();
+    }
+}
+
+function populateCheckoutModal() {
+    const itemsContainer = document.getElementById('checkoutItems');
+    itemsContainer.innerHTML = '';
+
+    // Include main selection
+    if (currentState.selectedHairstyle) {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `<span>${currentState.selectedHairstyle} (${currentState.selectedLength || 'Standard'})</span><strong>£${Number(currentState.price || 0).toFixed(2)}</strong>`;
+        itemsContainer.appendChild(div);
+    }
+
+    // Add addons / extensions
+    if (currentState.addons && currentState.addons.length > 0) {
+        currentState.addons.forEach(addon => {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.innerHTML = `<span>${addon.name}</span><strong>£${Number(addon.price || 0).toFixed(2)}</strong>`;
+            itemsContainer.appendChild(div);
+        });
+    }
+
+    const subtotal = getSubtotalPrice();
+    const totalEl = document.getElementById('checkoutTotal');
+    totalEl.textContent = `Subtotal: £${Number(subtotal).toFixed(2)}`;
+
+    // Wire modal buttons
+    const closeBtn = document.getElementById('closeCheckoutModal');
+    const cancelBtn = document.getElementById('cancelCheckoutBtn');
+    const confirmBtn = document.getElementById('confirmCheckoutBtn');
+
+    if (closeBtn) closeBtn.onclick = closeCheckoutModal;
+    if (cancelBtn) cancelBtn.onclick = closeCheckoutModal;
+    if (confirmBtn) confirmBtn.onclick = confirmCheckoutAndSend;
+}
+
+function confirmCheckoutAndSend() {
+    // Gather form values
+    const name = (document.getElementById('checkoutName') || {}).value || '';
+    const address = (document.getElementById('checkoutAddress') || {}).value || '';
+    const phone = (document.getElementById('checkoutPhone') || {}).value || '';
+    const delivery = document.querySelector('input[name="deliveryOption"]:checked') ? document.querySelector('input[name="deliveryOption"]:checked').value : 'standard';
+
+    let deliveryLabel = 'Standard UK Delivery (£4.99)';
+    let deliveryCost = 4.99;
+    if (delivery === 'express') { deliveryLabel = 'Express UK Delivery (£7.99)'; deliveryCost = 7.99; }
+    if (delivery === 'collection') { deliveryLabel = 'Collection (Pickup)'; deliveryCost = 0; }
+
+    const subtotal = getSubtotalPrice();
+    const total = Number(subtotal) + Number(deliveryCost);
+
+    // Build message
+    const lines = [];
+    lines.push('Hi 👋🏾💖');
+    lines.push('');
+    lines.push('I’d like to place an order with Slayed by Yili ✨💇🏾‍♀️');
+    lines.push('');
+    lines.push('🛍️ Order Details');
+
+    if (currentState.selectedHairstyle) {
+        lines.push(`• Hair: ${currentState.selectedHairstyle}`);
+    }
+    if (currentState.selectedLength) {
+        lines.push(`• Length: ${currentState.selectedLength}`);
+    }
+
+    // include specific extensions from addons that look like Bone Straight
+    currentState.addons.forEach(addon => {
+        lines.push(`• ${addon.name}`);
+    });
+
+    lines.push('');
+    lines.push('🚚 Delivery Method');
+    lines.push(`• ${deliveryLabel}`);
+    lines.push('');
+    lines.push('💷 Order Total');
+    lines.push(`• £${Number(total).toFixed(2)}`);
+    lines.push('');
+    lines.push('📍 Customer Details');
+    lines.push(`• Name: ${name}`);
+    lines.push(`• Delivery Address: ${address}`);
+    lines.push(`• Contact Number: ${phone}`);
+    lines.push('');
+    lines.push('Thank you 💕 I look forward to hearing from you');
+
+    const checkoutUrl = `https://wa.me/447500039928?text=${encodeURIComponent(lines.join('\n'))}`;
     window.open(checkoutUrl, '_blank');
+    closeCheckoutModal();
 }
 
 // Reschedule booking flow

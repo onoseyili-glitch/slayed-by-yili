@@ -1091,6 +1091,38 @@ section h2 {
 .search-result-item p { margin: 6px 0 0 0; color: #555; font-size: 13px; }
 .hidden { display: none !important; }
 
+/* Checkout modal */
+.modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.5);
+    z-index: 1400;
+}
+.modal .modal-content {
+    width: min(720px, 96%);
+    background: #fff;
+    padding: 18px;
+    border-radius: 8px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.25);
+    color: #111;
+}
+.modal .close-modal {
+    float: right;
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+}
+.checkout-items { margin: 12px 0 8px 0; }
+.checkout-items .item { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f1f1 }
+.checkout-delivery label { display:block; margin:6px 0 }
+.checkout-customer input { width:100%; padding:8px 10px; margin:6px 0; border:1px solid #ddd; border-radius:6px }
+.checkout-total { margin-top:12px; font-weight:700; font-size:1.05rem }
+.modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px }
+
 .portfolio-item {
     background: #000;
     border-radius: 8px;

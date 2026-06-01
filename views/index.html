@@ -519,7 +519,7 @@
                 <p>Ready to get slayed?</p>
                 <div class="contact-cta-row">
                     <button class="btn btn-primary" onclick="scrollToServices()">Book Now</button>
-                    <button class="btn btn-secondary" onclick="openCheckoutWhatsApp()">Checkout</button>
+                    <button class="btn btn-secondary" onclick="openCheckoutModal()">Checkout</button>
                 </div>
                 <div class="contact-details">
                     <p><strong>Email:</strong> <a href="mailto:pecusadoh@gmail.com">pecusadoh@gmail.com</a></p>
@@ -543,6 +543,36 @@
     </footer>
 
     <script src="/app.js"></script>
+    <!-- Checkout review modal -->
+    <div id="checkoutModal" class="modal hidden">
+        <div class="modal-content">
+            <button class="close-modal" id="closeCheckoutModal">×</button>
+            <h3>Review your order</h3>
+            <div id="checkoutItems" class="checkout-items"></div>
+
+            <div class="checkout-delivery">
+                <h4>Delivery options</h4>
+                <label><input type="radio" name="deliveryOption" value="standard" checked> Standard UK Delivery (£4.99)</label>
+                <label><input type="radio" name="deliveryOption" value="express"> Express UK Delivery (£7.99)</label>
+                <label><input type="radio" name="deliveryOption" value="collection"> Collection (Pickup)</label>
+            </div>
+
+            <div class="checkout-customer">
+                <h4>Customer details</h4>
+                <input id="checkoutName" placeholder="Full name" />
+                <input id="checkoutAddress" placeholder="Delivery address (if delivery)" />
+                <input id="checkoutPhone" placeholder="Contact number" />
+            </div>
+
+            <div id="checkoutTotal" class="checkout-total"></div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancelCheckoutBtn">Cancel</button>
+                <button class="btn btn-primary" id="confirmCheckoutBtn">Confirm & Send to WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Floating site search button + checkout button -->
     <button id="siteCheckoutButton" aria-label="Checkout cart">🛒 Checkout</button>
     <button id="siteSearchButton" aria-label="Search site">🔍</button>
