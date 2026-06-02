@@ -1126,12 +1126,17 @@ function populateCheckoutModal() {
             div.className = 'item';
             const price = Number(addon.price || 0).toFixed(2);
 
-            if (addon.color) {
-                const qty = addon.quantity || 1;
-                div.innerHTML = `<div><strong>${addon.name} — ${addon.color} × ${qty}</strong></div><strong>£${price}</strong>`;
+            // if color is missing, try to extract from name like "Bone Straight Extensions (T33) x2"
+            const inferredColorMatch = (!addon.color && addon.name) ? addon.name.match(/\(([^)]+)\)/) : null;
+            const color = addon.color || (inferredColorMatch ? inferredColorMatch[1] : '');
+            const baseName = addon.name ? addon.name.replace(/\s*\([^)]*\)/, '').replace(/\s+x\d+$/, '') : 'Item';
+            const qty = addon.quantity || 1;
+
+            if (color) {
+                div.innerHTML = `<div><strong>${baseName} — ${color} × ${qty}</strong></div><strong>£${price}</strong>`;
             } else {
-                const qtySuffix = addon.quantity && Number(addon.quantity) > 1 ? ` × ${addon.quantity}` : '';
-                div.innerHTML = `<div><strong>${addon.name}${qtySuffix}</strong></div><strong>£${price}</strong>`;
+                const qtySuffix = qty && Number(qty) > 1 ? ` × ${qty}` : '';
+                div.innerHTML = `<div><strong>${baseName}${qtySuffix}</strong></div><strong>£${price}</strong>`;
             }
             itemsContainer.appendChild(div);
         });
@@ -1206,10 +1211,15 @@ function confirmCheckoutAndSend() {
         lines.push('');
         lines.push('🧩 Add-ons & Extensions');
         currentState.addons.forEach(addon => {
-            if (addon.color) {
-                lines.push(`• Bone Straight Extension - ${addon.color} × ${addon.quantity || 1}`);
+            // infer color if missing
+            const inferredColorMatch = (!addon.color && addon.name) ? addon.name.match(/\(([^)]+)\)/) : null;
+            const color = addon.color || (inferredColorMatch ? inferredColorMatch[1] : '');
+            const baseName = addon.name ? addon.name.replace(/\s*\([^)]*\)/, '').replace(/\s+x\d+$/, '') : 'Item';
+            const qty = addon.quantity || 1;
+            if (color) {
+                lines.push(`• ${baseName} - ${color} × ${qty}`);
             } else {
-                lines.push(`• ${addon.name}${addon.quantity ? ' × ' + addon.quantity : ''}`);
+                lines.push(`• ${baseName}${qty ? ' × ' + qty : ''}`);
             }
         });
     }
