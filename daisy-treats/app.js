@@ -26,7 +26,8 @@ if (inspoUpload) {
             reader.readAsDataURL(file);
         });
 
-        uploadNote.textContent = `${files.length} photo${files.length > 1 ? 's' : ''} selected. Send them in WhatsApp after it opens.`;
+        const canShareFiles = navigator.canShare && navigator.canShare({ files });
+        uploadNote.textContent = `${files.length} photo${files.length > 1 ? 's' : ''} selected. ${canShareFiles ? 'These can be shared directly into WhatsApp when you send your enquiry.' : 'WhatsApp will open next so you can attach them manually.'}`;
     });
 }
 
@@ -40,7 +41,7 @@ if (enquiryForm) {
         const date = formData.get('date')?.toString().trim() || '';
         const details = formData.get('details')?.toString().trim() || '';
         const fileCount = inspoUpload && inspoUpload.files.length > 0
-            ? `\nInspo photos: ${inspoUpload.files.length} image${inspoUpload.files.length > 1 ? 's' : ''} selected — I will send them here in WhatsApp.`
+            ? `\nInspo photos: ${inspoUpload.files.length} image${inspoUpload.files.length > 1 ? 's' : ''} selected — sending them with this enquiry if supported.`
             : '';
 
         const message = [
@@ -53,14 +54,28 @@ if (enquiryForm) {
             fileCount
         ].join('\n');
 
-        const whatsappUrl = `https://wa.me/447721641230?text=${encodeURIComponent(message)}`;
+        const files = inspoUpload && inspoUpload.files.length > 0 ? Array.from(inspoUpload.files).slice(0, 6) : [];
+        const canShareFiles = files.length > 0 && navigator.share && navigator.canShare && navigator.canShare({ files });
 
-        window.open(whatsappUrl, '_blank', 'noopener');
-
-        if (formNote) {
-            formNote.textContent = inspoUpload && inspoUpload.files.length > 0
-                ? 'WhatsApp opened. Now send your inspiration photos directly in the chat.'
-                : 'WhatsApp opened in a new tab with your enquiry message.';
+        if (canShareFiles) {
+            navigator.share({
+                text: message,
+                files
+            }).catch(() => {
+                const whatsappUrl = `https://wa.me/447721641230?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank', 'noopener');
+            });
+            if (formNote) {
+                formNote.textContent = 'If your device supports it, the selected photos will be shared into WhatsApp with your enquiry.';
+            }
+        } else {
+            const whatsappUrl = `https://wa.me/447721641230?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank', 'noopener');
+            if (formNote) {
+                formNote.textContent = inspoUpload && inspoUpload.files.length > 0
+                    ? 'WhatsApp opened. Attach your selected inspiration photos in the chat if they were not shared automatically.'
+                    : 'WhatsApp opened in a new tab with your enquiry message.';
+            }
         }
     });
 }

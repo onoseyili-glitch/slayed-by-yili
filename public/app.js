@@ -1058,7 +1058,12 @@ function populateCheckoutModal() {
         currentState.addons.forEach(addon => {
             const div = document.createElement('div');
             div.className = 'item';
-            div.innerHTML = `<span>${addon.name}</span><strong>£${Number(addon.price || 0).toFixed(2)}</strong>`;
+
+            const label = addon.color ? 'Bone Straight Extension' : addon.name;
+            const subtitle = addon.color ? `<div class="item-meta">• ${addon.color} × ${addon.quantity || 1}</div>` : '';
+            const price = Number(addon.price || 0).toFixed(2);
+
+            div.innerHTML = `<div><strong>${label}</strong>${subtitle}</div><strong>£${price}</strong>`;
             itemsContainer.appendChild(div);
         });
     }
@@ -1107,10 +1112,18 @@ function confirmCheckoutAndSend() {
         lines.push(`• Length: ${currentState.selectedLength}`);
     }
 
-    // include specific extensions from addons that look like Bone Straight
-    currentState.addons.forEach(addon => {
-        lines.push(`• ${addon.name}`);
-    });
+    // include specific extensions from addons with clear colour variants
+    if (currentState.addons && currentState.addons.length > 0) {
+        lines.push('');
+        lines.push('🧩 Add-ons & Extensions');
+        currentState.addons.forEach(addon => {
+            if (addon.color) {
+                lines.push(`• Bone Straight Extension - ${addon.color} × ${addon.quantity || 1}`);
+            } else {
+                lines.push(`• ${addon.name}${addon.quantity ? ' × ' + addon.quantity : ''}`);
+            }
+        });
+    }
 
     lines.push('');
     lines.push('🚚 Delivery Method');
