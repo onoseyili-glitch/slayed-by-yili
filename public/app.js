@@ -122,12 +122,21 @@ let currentState = {
     price: null,
     addons: [],
     addonTotal: 0,
+    boneExtensionColorCounts: {},
     discountCode: null,
     discountAmount: 0,
     paymentIntentId: null,
     selectedDate: null,
     selectedTime: null
 };
+
+function getBoneExtensionTotalCount() {
+    return Object.values(currentState.boneExtensionColorCounts || {}).reduce((sum, qty) => sum + (Number(qty) || 0), 0);
+}
+
+function resetBoneExtensionColorCounts() {
+    currentState.boneExtensionColorCounts = {};
+}
 
 // Initialize Stripe
 let stripe, cardElement;
@@ -414,13 +423,22 @@ function openPricingModal() {
 
         const quantityInput = document.querySelector(`.addon-qty-input[data-related-checkbox="#${checkbox.id}"]`);
         if (quantityInput) {
-            quantityInput.value = '1';
+            quantityInput.value = '0';
+            quantityInput.min = '0';
             quantityInput.disabled = true;
             quantityInput.addEventListener('change', () => {
                 let quantity = parseInt(quantityInput.value, 10);
-                if (isNaN(quantity) || quantity < 1) quantity = 1;
+                if (isNaN(quantity) || quantity < 0) quantity = 0;
                 quantityInput.value = quantity;
-                checkbox.dataset.addonQuantity = quantity.toString();
+
+                if (checkbox.id === 'addon-bone-extensions') {
+                    const colorKey = checkbox.dataset.addonColor || 'T33';
+                    currentState.boneExtensionColorCounts[colorKey] = quantity;
+                    checkbox.dataset.addonQuantity = getBoneExtensionTotalCount().toString();
+                } else {
+                    checkbox.dataset.addonQuantity = quantity.toString();
+                }
+
                 if (checkbox.checked) updateAddonPrice();
             });
         }
@@ -429,11 +447,14 @@ function openPricingModal() {
             if (quantityInput) {
                 if (checkbox.checked) {
                     quantityInput.disabled = false;
-                    checkbox.dataset.addonQuantity = parseInt(quantityInput.value, 10) || 1;
+                    checkbox.dataset.addonQuantity = getBoneExtensionTotalCount().toString();
                 } else {
                     quantityInput.disabled = true;
-                    quantityInput.value = '1';
-                    checkbox.dataset.addonQuantity = '1';
+                    quantityInput.value = '0';
+                    checkbox.dataset.addonQuantity = '0';
+                    if (checkbox.id === 'addon-bone-extensions') {
+                        resetBoneExtensionColorCounts();
+                    }
                 }
             }
             updateAddonPrice();
@@ -444,18 +465,37 @@ function openPricingModal() {
     document.querySelectorAll('.extension-color-picker').forEach(picker => {
         const relatedSelector = picker.dataset.relatedCheckbox;
         const relatedCheckbox = relatedSelector ? document.querySelector(relatedSelector) : null;
+
+        // initialize selected color on load
+        const selectedButton = picker.querySelector('.color-option.selected');
+        if (selectedButton && relatedCheckbox) {
+            relatedCheckbox.dataset.addonColor = selectedButton.dataset.addonColor;
+        }
+
         picker.querySelectorAll('.color-option').forEach(btn => {
             btn.addEventListener('click', () => {
-                // mark selected button
-                picker.querySelectorAll('.color-option').forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
-
                 const color = btn.dataset.addonColor;
+                if (relatedCheckbox && relatedCheckbox.checked) {
+                    btn.classList.add('selected');
+                } else {
+                    picker.querySelectorAll('.color-option').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                }
+
                 if (relatedCheckbox) {
                     relatedCheckbox.dataset.addonColor = color;
                 }
-                // if the addon is already checked, update the addon list/prices to include color
-                if (relatedCheckbox && relatedCheckbox.checked) updateAddonPrice();
+
+                if (relatedCheckbox && relatedCheckbox.checked) {
+                    const quantityInput = document.querySelector(`.addon-qty-input[data-related-checkbox="#${relatedCheckbox.id}"]`);
+                    currentState.boneExtensionColorCounts[color] = (Number(currentState.boneExtensionColorCounts[color]) || 0) + 1;
+                    const total = getBoneExtensionTotalCount();
+                    if (quantityInput) {
+                        quantityInput.value = total;
+                    }
+                    relatedCheckbox.dataset.addonQuantity = total.toString();
+                    updateAddonPrice();
+                }
             });
         });
     });
@@ -558,9 +598,34 @@ function updateAddonPrice() {
     currentState.addonTotal = 0;
 
     document.querySelectorAll('.addon-checkbox:checked').forEach(checkbox => {
-        const color = checkbox.dataset.addonColor || '';
-        const quantity = parseInt(checkbox.dataset.addonQuantity || '1', 10) || 1;
         const unitPrice = parseInt(checkbox.dataset.addonPrice, 10) || 0;
+        const color = checkbox.dataset.addonColor || '';
+        const quantity = parseInt(checkbox.dataset.addonQuantity || '0', 10) || 0;
+
+        if (checkbox.id === 'addon-bone-extensions') {
+            const counts = currentState.boneExtensionColorCounts || {};
+            const totalCount = getBoneExtensionTotalCount();
+
+            // If the user has manually set a quantity but not selected any colors yet,
+            // assign that quantity to the current selected color.
+            if (totalCount === 0 && quantity > 0 && color) {
+                counts[color] = quantity;
+            }
+
+            Object.entries(counts).forEach(([colorKey, colorQty]) => {
+                if (!colorQty || Number(colorQty) <= 0) return;
+                const colorPrice = unitPrice * Number(colorQty);
+                currentState.addons.push({
+                    name: `Bone Straight Extensions`,
+                    price: colorPrice,
+                    color: colorKey,
+                    quantity: Number(colorQty)
+                });
+                currentState.addonTotal += colorPrice;
+            });
+            return;
+        }
+
         const price = unitPrice * quantity;
         let addonName = color ? `${checkbox.dataset.addonName} (${color})` : checkbox.dataset.addonName;
         if (quantity > 1) {
@@ -1025,6 +1090,7 @@ function scrollToServices() {
 }
 
 function openCheckoutModal() {
+    updateAddonPrice();
     populateCheckoutModal();
     const modal = document.getElementById('checkoutModal');
     if (modal) {
@@ -1083,6 +1149,7 @@ function populateCheckoutModal() {
 }
 
 function confirmCheckoutAndSend() {
+    updateAddonPrice();
     // Gather form values
     const name = (document.getElementById('checkoutName') || {}).value || '';
     const address = (document.getElementById('checkoutAddress') || {}).value || '';
