@@ -1124,12 +1124,15 @@ function populateCheckoutModal() {
         currentState.addons.forEach(addon => {
             const div = document.createElement('div');
             div.className = 'item';
-
-            const label = addon.color ? 'Bone Straight Extension' : addon.name;
-            const subtitle = addon.color ? `<div class="item-meta">• ${addon.color} × ${addon.quantity || 1}</div>` : '';
             const price = Number(addon.price || 0).toFixed(2);
 
-            div.innerHTML = `<div><strong>${label}</strong>${subtitle}</div><strong>£${price}</strong>`;
+            if (addon.color) {
+                const qty = addon.quantity || 1;
+                div.innerHTML = `<div><strong>${addon.name} — ${addon.color} × ${qty}</strong></div><strong>£${price}</strong>`;
+            } else {
+                const qtySuffix = addon.quantity && Number(addon.quantity) > 1 ? ` × ${addon.quantity}` : '';
+                div.innerHTML = `<div><strong>${addon.name}${qtySuffix}</strong></div><strong>£${price}</strong>`;
+            }
             itemsContainer.appendChild(div);
         });
     }
