@@ -1139,7 +1139,26 @@ function populateCheckoutModal() {
 
     const subtotal = getSubtotalPrice();
     const totalEl = document.getElementById('checkoutTotal');
-    totalEl.textContent = `Subtotal: £${Number(subtotal).toFixed(2)}`;
+
+    function updateCheckoutTotals() {
+        const deliveryRadio = document.querySelector('input[name="deliveryOption"]:checked');
+        const delivery = deliveryRadio ? deliveryRadio.value : 'standard';
+        let deliveryLabel = 'Standard UK Delivery (£4.99)';
+        let deliveryCost = 4.99;
+        if (delivery === 'express') { deliveryLabel = 'Express UK Delivery (£7.99)'; deliveryCost = 7.99; }
+        if (delivery === 'collection') { deliveryLabel = 'Collection (Pickup)'; deliveryCost = 0; }
+
+        const subtotalVal = Number(getSubtotalPrice() || 0);
+        const totalVal = Number((subtotalVal + deliveryCost).toFixed(2));
+
+        totalEl.innerHTML = `Subtotal: £${subtotalVal.toFixed(2)}<br>Delivery: ${deliveryLabel}<br><strong>Total: £${totalVal.toFixed(2)}</strong>`;
+    }
+
+    // attach change listeners to delivery options to update totals live
+    document.querySelectorAll('input[name="deliveryOption"]').forEach(r => r.addEventListener('change', updateCheckoutTotals));
+
+    // initial totals render
+    updateCheckoutTotals();
 
     // Wire modal buttons
     const closeBtn = document.getElementById('closeCheckoutModal');
